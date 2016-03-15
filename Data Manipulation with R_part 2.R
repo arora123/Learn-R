@@ -1,0 +1,143 @@
+# Functions & Operators used:
+
+
+# select(); filter(); group_by(); summarise(); arrange(); desc(); join(); mutate() 
+# rename(); summarise_each()
+# statistical functions funs(mean, n()); n(); mean(); sd()
+# pipe operator (%>%); airthmatic operators;
+
+#_____________________________________________________________
+
+# Package used:
+
+# dplyr by Hadley Wickham (Data Manipulation in R_part 2)
+
+#_____________________________________________________________
+
+# To install and load packages:
+
+install.packages("dplyr"); library(dplyr)
+
+# To load pre-installed r data sets
+
+data("mtcars")
+data('iris')
+fix(mtcars); fix(iris) # To view data
+
+#_____________________________________________________________
+
+# mutate() create new variables
+# Objective: Creates new variables
+# Description: Often we want to create a new variable that is a function of the current variables in our dataframe or even just add a new variable. 
+# The mutate() function allows us to add new variables while preserving the existing variables.
+
+mtcar_1 <- mtcars %>% mutate(newvariable = mpg*cyl)
+mtcar_2 <- mtcars %>% mutate(newvariable = mpg/cyl)
+mtcar_3 <- mtcars %>% mutate(newvariable = mpg+cyl)
+mtcar_4 <- mtcars %>% mutate(newvariable = mpg-cyl)
+mtcar_5 <- mtcars %>% mutate(newvariable = mpg^cyl)
+remove(mtcar_1, mtcar_2, mtcar_3, mtcar_4, mtcar_5)
+
+#_____________________________________________________________
+
+#filter function:
+# filter() provides basic filtering capabilities
+# Objective: Reduce rows/observations with matching conditions
+# Description: Filtering data is a common task to identify/select observations in which 
+# a particular variable matches a specific value/condition. 
+
+filter (mtacres, cyl > 6)
+filter(mtcars, cyl > 4 & gear > 4)
+filter(mtcars, cyl > 6, gear > 4)
+filter(mtcars, cyl > 4, carb == 6)
+filter(mtcars, cyl > 6 | gear ==5)
+#_____________________________________________________________
+
+# select() selecting variables
+# Objective: Reduce dataframe size to only desired variables for current task
+# Description: When working with a sizable dataframe, often we desire to only assess specific variables. 
+# The select() function allows you to select and/or rename variables.
+# To select three columns named cyl, mpg, carb for further analysis
+
+select (mtcars, cyl, mpg, carb)
+
+# To select all but two columns named cyl, disp
+select (mtcars, - cyl, - disp) # same as select (mtcars, - c (cyl, disp))
+
+# To hide a range of columns
+select (mtcars, - c (cyl, hp))
+
+# To hide a series of columns
+select (mtcars, -(cyl:qsec))
+
+# To select a series of columns
+select (mtcars, cyl:qsec)
+
+# Chaining or pipelining _ To perform multiple operations in one line
+# Select three columns & filter
+mtcars %>%
+  select (mpg, cyl, gear) %>%
+  filter (cyl > 4 & gear == 5)
+# Select three columns, filter and arrange (in ascending order of mpg)
+mtcars %>%
+  select (mpg, cyl, gear) %>%
+  filter (cyl > 4 & gear == 5) %>%
+  arrange (mpg) 
+# Select three columns, filter and arrange (in descending order of mpg)
+mtcars %>%
+  select (mpg, cyl, gear) %>%
+  filter (cyl > 4 & gear == 5) %>%
+  arrange (desc(mpg)) 
+# Select three columns, filter, arrange (in descending order of mpg) & create a new variable
+mtcars %>%
+  select (mpg, cyl, gear) %>%
+  filter (cyl > 4 & gear == 5) %>%
+  arrange (desc(mpg)) %>%
+  mutate (newvariable = cyl*gear)
+
+# Note: arrange() provides ordering data (ascending by default); desc() is used for descending
+# arrange( ) function:
+# Objective: Order variable values
+# Description: Often, we desire to view observations in rank order for a particular variable(s). 
+# The arrange() function allows us to order data by variables in accending or descending order.
+#_____________________________________________________________
+
+# group_by( ) function:
+# group_by() groups data by categorical levels
+# Objective: Group data by categorical variables
+# Description: Often, observations are nested within groups or categories and 
+# our goals is to perform statistical analysis both at the observation level and also at the group level. 
+# The group_by() function allows us to create these categorical groupings.
+#_____________________________________________________________
+
+# summarise() function:
+# summarise() summarise data by functions of choice
+# To compute average milage of cars for each group of cyl
+mtcars %>%
+  group_by (cyl) %>%
+  summarise (Average_milage = mean(mpg))
+
+# To compute average sepal length for each group of species
+iris %>%
+  group_by (Species)  %>%
+  summarise (Average = mean(Sepal.Length, na.rm = TRUE))
+
+# To summarise sepal length and sepal width of different groups of species ?funs(mean, n()); ?n()
+iris %>%
+  group_by (Species) %>%
+  summarise_each (funs(mean, n(), sd()), Sepal.Length, Sepal.Width)
+
+# Note: funs(...) provides a list of functions
+# n()_ number of obs; mean()_ average value; sd()_ standard deviation
+
+# To rename one or more variables
+mtcars %>%
+  rename(miles = mpg, cylinders = cyl)
+
+#_____________________________________________________________
+
+# join( ) functions:
+# join() joining separate dataframes
+# Objective: Join two datasets together
+# Description: Often we have separate dataframes that can have common and differing variables for similar observations and we wish to join these dataframes together. 
+# The multiple xxx_join() functions provide multiple ways to join dataframes.
