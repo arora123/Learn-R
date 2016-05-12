@@ -1,0 +1,65 @@
+gender_vector <- c("Male", "Female", "Female", "Male", "Male")
+
+# Define factor_gender_vector using 'factor()'
+factor_gender_vector <- factor(gender_vector)
+factor_gender_vector
+
+hair.color.vector <- c("Blonde", "Blonde", "Brunette", "Ginger", "Grey", "Brunette")
+temperature.vector <- c("High", "Low", "High", "Low", "Medium")
+
+factor.hair.color.vector <- factor(hair.color.vector)
+factor.temperature.vector <- factor(temperature.vector, order = TRUE, levels = c("High", 
+                                                                                 "Medium", "Low"))
+
+factor.temperature.vector
+factor.hair.color.vector
+
+## Factor Levels
+
+# Code to form the factor vector
+survey_vector <- c("M", "F", "F", "M", "M")
+factor_survey_vector <- factor(survey_vector)
+
+# Specify the levels of 'factor_survey_vector'
+levels(factor_survey_vector) <- c("Female", "Male")
+
+factor_survey_vector
+
+survey_vector <- c("M", "F", "F", "M", "M")
+factor_survey_vector <- factor(survey_vector)
+levels(factor_survey_vector) <- c("Female", "Male")
+factor_survey_vector
+
+# Type your code here for 'survey_vector'
+summary(survey_vector)
+
+# Type your code here for 'factor_survey_vector'
+summary(factor_survey_vector)
+
+
+# Create 'speed_vector'
+speed_vector <- c("Fast", "Slow", "Slow", "Fast", "Ultra-fast")
+
+speed_vector
+
+speed_vector <- c("Fast", "Slow", "Slow", "Fast", "Ultra-fast") 
+
+# Add your code below
+factor_speed_vector <-  factor(speed_vector,ordered=TRUE,levels=c("Slow","Fast","Ultra-fast"))
+
+# Print
+factor_speed_vector
+
+# R prints automagically in the right order
+summary(factor_speed_vector) # R prints automagically in the right order
+
+speed_vector <- c("Fast", "Slow", "Slow", "Fast", "Ultra-fast")
+factor_speed_vector <- factor(speed_vector, ordered = TRUE, levels = c("Slow", "Fast", "Ultra-fast"))
+
+# Your code below
+compare_them <- speed_vector[2] > speed_vector[5]
+
+# Is data analyst 2 faster than data analyst 5?
+compare_them
+
+
