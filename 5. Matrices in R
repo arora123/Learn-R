@@ -1,0 +1,161 @@
+# Learning R from data camp - R programming course _ module - 3
+
+### MATRICES IN R
+
+
+## Contents
+## Constructing a matrix in R
+## Naming a matrix in R
+## Subsetting of a matrix in R
+## Matrix arithmatics in R
+
+
+## MATRIX CREATION IN R
+# To create a matrix of dimension (1,1) i.e. a single element matrix
+aa <- 2 # To assign value to the object 'aa'
+dim(aa) = c(1, 1) # To define the dimension of object i.e. one row and one column
+aa # To print the object(matrix) 'aa'
+
+# To create a matrix by using matrix() function
+# See more here
+?matrix()
+
+# Construction of a matrix with 3 rows containing the numbers 1 upto 9
+x = matrix(1:9, nrow = 3, ncol = 3) 
+# By default byrow is FALSE, so matrix is created by column and dimnames are NULL, so no dimensions names are defined.
+x
+
+y = matrix(1:9, 3, 3) # Alternate way 
+y
+
+# To create a matrix by using by column
+z = matrix(1:9, nrow = 3, ncol = 3, byrow = TRUE) # By default byrow is FALSE, so matrix is created by column
+z
+
+
+# More examples
+a <- matrix(1:9, byrow=TRUE, nrow=3)
+one <- c(1,0,0)
+two <- c(0,1,0)
+three <- c(0,0,1)
+b <- cbind(one,two,three)
+c <- rbind(one,two,three)
+d<- b%%a
+e<- a%%c
+# print
+a
+one
+b
+c
+d
+e
+
+# Box office Star Wars: In Millions (!)  First element: US, Second
+# element: Non-US
+new.hope <- c(460.998007, 314.4)
+empire.strikes <- c(290.475067, 247.9)
+return.jedi <- c(309.306177, 165.8)
+
+# To construct the matrix
+rows = c(new.hope,empire.strikes,return.jedi)
+rows
+star.wars.matrix <- matrix(c(new.hope,empire.strikes,return.jedi), byrow=TRUE, nrow=3)
+# Show me the
+star.wars.matrix
+
+## Naming a matrix
+
+# Box office Star Wars: In Millions (!)  First element: US, Second
+# element: Non-US
+new.hope <- c(460.998007, 314.4)
+empire.strikes <- c(290.475067, 247.9)
+return.jedi <- c(309.306177, 165.8)
+
+# Construct matrix:
+star_wars_matrix <- matrix(c(new.hope, empire.strikes, return.jedi), nrow = 3,byrow = TRUE)
+
+# Add your code here such that rows and columns of star.wars have a name!
+colnames(star_wars_matrix) <- c("US","non-US")
+rownames(star_wars_matrix) <- c("A new hope","The empire srikes back","Return of the Jedi")
+# Print the matrix to the console:
+star_wars_matrix
+head(star_wars_matrix)
+
+## To Calculate the worldwide box office figures for the three movies and put these in the vector named worldwide_vector.
+
+# Box office Star Wars: In Millions (!) 
+# Construct matrix: 
+box.office.all <- c(461, 314.4,290.5, 247.9,309.3,165.8)
+movie.names    <- c("A new hope","The empire strikes back","Return of the Jedi")
+col.titles     <-  c("US","non-US")
+star.wars.matrix      <- matrix(box.office.all, nrow=3, byrow=TRUE,dimnames=list(movie.names,col.titles))
+
+
+worldwide.vector <- rowSums(star.wars.matrix)
+
+# Show me the
+dimnames
+worldwide.vector
+head(worldwide.vector)
+
+## Add worldwide_vector as a new column to the star_wars_matrix and assign the result to all_wars_matrix
+
+# Box office Star Wars: In Millions (!)  Construct matrix:
+box.office.all <- c(461, 314.4, 290.5, 247.9, 309.3, 165.8)
+movie.names <- c("A new hope", "The empire strikes back", "Return of the Jedi")
+col.titles <- c("US", "non-US")
+star.wars.matrix <- matrix(box.office.all, nrow = 3, byrow = TRUE, dimnames = list(movie.names, 
+                                                                                   col.titles))
+worldwide.vector <- rowSums(star.wars.matrix)
+
+# Bind the new variable total.per.movie as a column to star.wars
+all.wars.matrix <- cbind(star.wars.matrix, worldwide.vector)
+# Show me the
+all.wars.matrix
+
+
+# Print box office Star Wars: In Millions (!) for 2 trilogies
+all.wars.matrix <- cbind(star.wars.matrix, worldwide.vector)
+total.revenue.vector <- colSums(all.wars.matrix)
+all.wars.matrix
+total.revenue.vector
+
+
+## Matrix Subsetting
+
+# Box office Star Wars: In Millions (!) 
+# Construct matrix: 
+box.office.all <- c(461, 314.4,290.5, 247.9,309.3,165.8)
+movie.names    <- c("A new hope","The empire strikes back","Return of the Jedi")
+col.titles     <-  c("US","non-US")
+star.wars.matrix  <- matrix(box.office.all, nrow=3, byrow=TRUE,  
+                            dimnames=list(movie.names,col.titles)) 
+
+non.us.matrix <- star.wars.matrix[,2]
+non.us.2movies.matrix <- star.wars.matrix[1:2,2]
+non.us.all  <- mean(non.us.matrix)
+non.us.some <- mean(non.us.2movies.matrix)
+
+# Print both averages  to console:
+non.us.matrix
+non.us.2movies.matrix
+non.us.all
+non.us.some
+
+## Matrix airthmatics
+## Assign the matrix with the estimated number of Non-US and US visitors for the three movies to visitors.
+visitors <- star.wars.matrix/5
+
+# Show me (also in millions!) the 
+visitors
+
+ticket.prices.matrix  <- matrix( c(5,5,6,6,7,7), nrow=3,byrow=TRUE,dimnames=list(movie.names,col.titles)) 
+
+visitors <- star.wars.matrix/ticket.prices.matrix
+average.us.visitor <- mean(visitors[,1])
+average.non.us.visitor <- mean(visitors[,2])
+
+#Show me the (all in Millions)
+visitors
+average.us.visitor
+average.non.us.visitor
