@@ -1,0 +1,261 @@
+
+###############################################################################################
+
+# Chapter - 3 Linear Regression
+# Introduction to Statistical Learning with applications in R
+
+###############################################################################################
+
+# Basic of lm() function [MASS and ISLR library] Regression for quantitative predictors
+# Multiple linear regression [car package for VIF]
+     # Interaction term
+     # NON_LINEAR TRANSFORMATIONS OF PREDICTORS
+     # Comparing different models using anova
+# Regression with qualitative predictors
+
+# Practice Excercises
+
+###############################################################################################
+
+# Basic of lm() function [MASS and ISLR library]
+getwd()
+adver=read.csv("Advertising.csv"); names(adver); dim(adver); summary(adver); fix(adver)
+par(mfrow=c(2,2))
+plot(adver$TV, adver$Sales, xlab="TV", Ylabs = "Sales", main="Sales Vs TV")
+plot(adver$TV, adver$Sales, xlab="Radio", Ylabs = "Sales", main="Sales Vs Radio")
+plot(adver$TV, adver$Sales, xlab="Newspaper", Ylabs = "Sales", main="Sales Vs Newspaper")
+
+mean(adver$Sales)
+m1=lm(adver$Sales ~ adver$TV); summary(m1)
+# For Sales on TV regression line, parameters are beta zero = 7.032594 & beta one = 0.047537
+m2=lm(adver$Sales ~ adver$Radio); summary(m2)
+m3=lm(adver$Sales ~ adver$Newspaper); summary(m3)
+m4=lm(adver$Sales ~ adver$TV+adver$Radio+adver$Newspaper); summary(m4)
+?cor()
+cor(adver)
+
+demo(persp)
+?persp()
+persp(adver$TV, adver$Radio, adver$Sales)
+
+
+library(MASS) # To load MASS library
+install.packages("ISLR") # To install ISLR package
+library(ISLR) # To load ISLR package
+?Boston; fix(Boston ); names(Boston ) # To see description of Boston dataset, to view data & to see name of all variables in the dataset
+m1=lm(medv∼lstat ,data=Boston) # To fit simple linear regession
+m1=attach(Boston); lm(medv~lstat) # ALternate ways of fitting linear regression
+m1=lm(Boston$medv~Boston$lstat)
+summary(m1) # To get details-p value, SE of coefficients, R2, F statistics
+names(m1) # To find out what other pieces of information are stored in m1
+m1$coefficients; m1$rank; m1$model # To extract coefficients, rank and model etc.
+coef(m1) # Better way to extract coefficients
+residuals(m1); rstudent(m1) # To get residulas and studentized residuals of the mode
+confint(m1) # To get confidence interval for coefficient estimates
+?predict()
+predict(m1, interval = "confidence") # To predict CI for prediction of medv 
+predict(m1, interval = "prediction") # To predict PI for prediction of medv 
+
+predict(m1, data.frame(lstat= c(5, 10, 15)), interval = "confidence") # To predict CI for prediction of medv for particular values 5, 10, 15 of lstat
+predict(m1, data.frame(lstat= c(5, 10, 15)), interval = "prediction") # To predict PI for prediction of medv for particular values 5, 10, 15 of lstat
+
+attach(Boston); plot(lstat ,medv) # To get a sctter plot between the two variables
+attach(Boston); plot(lstat ,medv); abline (m1); ?abline() # To add straight line to the plot
+
+plot(lstat ,medv ,col ="blue")
+abline (m1,lwd =3, col ="red ") # To add line of WIDTH 3 Colur red
+plot(lstat ,medv ,pch =20); plot(lstat ,medv ,pch ="*");  plot(lstat ,medv ,pch ="+") # To crete differnt symbols using pch option
+
+plot(m1) # To get all diagnostic plots automatically can be seen one by one by hitting return in console
+ 
+par(mfrow=c(2,2)) # To split disply screen in saparte panels here 2 X 2 grids using par function
+plot(m1) # To view all plots
+par(mfrow= c(1,2))
+plot(predict(m1), residuals(m1)); plot(predict(m1), rstudent(m1)) # alternate way to get residula plots
+
+hatvalues(m1) # To find the leverage statistics
+which.max (hatvalues (m1)) # To find the index of largest leverage statistics
+par(mfrow=c(1,1)); plot(hatvalues(m1))
+
+#######################################################################################
+
+# Multiple linear regression
+
+lm.fit =lm(medv∼lstat+age ,data=Boston); summary (lm.fit) # To fit MLR model with 2 predictors
+## TAKING ALL VARIABLES TOGETHER
+lm.fit =lm(medv∼.,data=Boston ); summary (lm.fit) # To fit MLR model with all predictors
+?summary.lm
+summary(lm.fit)$r.sq; summary(lm.fit)$sigma # To get R2 and RSE for this model
+
+install.packages("car") # To install "car package", which is Companion to Applied Regression
+library("car")
+
+vif(lm.fit) # To compute variance inflation factors VIF
+
+lm.fit1=lm(medv~.-age ,data=Boston); summary(lm.fit1) # MLR model for all variables except one "age"
+vif(lm.fit1)
+
+lm.fit1=update (lm.fit , ~.-age) # alternate way to update model
+
+## INTERACTION TERM
+lm(medv~lstat:black, data = Boston) # To include interaction trem lstat*black
+summary(lm(medv~lstat*black, data = Boston)) # To get summary of the model by including individual predictors lstat & black and their interaction term lstat*black
+?I()
+
+## NON_LINEAR TRANSFORMATIONS OF PREDICTORS
+lm.fit2 = lm(medv~lstat+I(lstat^2)) # To perform a regression of medv onto lstat and lstat2.
+summary(lm.fit2)
+
+lm.fit=lm(medv~lstat, data=Boston)
+
+## TO compare two different models
+anova(lm.fit, lm.fit2) # To perform a hypothesis test comparing the two models with 
+# null hypothesis is that the two models fit the data equally well, alternative hypothesis is that the full model is superior.
+# small p-value suggest 2nd model is better as RSS is less
+
+par(mfrow=c(2,2)); plot(lm.fit2) # To get dignostive plots of model2 shows little visible pattern in residulas
+
+lm.fit5 = lm(medv~poly(lstat, 5)); summary(lm.fit5) # To fit MLR including a polynomial of degree 5 with predictor lstat
+anova(lm.fit2, lm.fit5) # To compare these two models
+# small p-value suggest the latter model is better
+plot(lm.fit5)
+
+lm.fit6 = lm(medv~poly(lstat, 6)); summary(lm.fit5) # To fit MLR including a polynomial of degree 6 with predictor lstat
+anova(lm.fit5, lm.fit6); plot(lm.fit6) # Suggests no further improvement 
+
+lm.log = (lm(medv∼log(rm),data=Boston )); summary(lm.log) # Using log transformation
+anova(lm.log, lm.fit6), plot(lm.log)
+
+###############################################################################################
+
+## Regression with qualitative predictors
+
+fix(Carseats); names(Carseats); ?Carseats # Carseats data in ISLR package
+# Here, ShelveLoc, Urban and US are categorical variables
+m1=lm(Sales~., data = Carseats); summary(m1)
+# R created dummy variables (k-1 for k categories) for each of the categorical variables
+
+attach (Carseats); contrasts (ShelveLoc) # To get the coding of ShelveLoc variable
+contrasts(Carseats$Urban) # To get the coding of Urban variable
+attach (Carseats); contrasts (US) # To get the coding of US variable
+?contrasts() # To change coding level use contrasts function
+
+## To create a function with no argument
+Loadlibraries = function(){
+library(ISLR)
+library(MASS)
+print("The libraries have been loaded.")
+}
+
+# This function, when called, load two libraries ISLR and MASS and print the statement.
+Loadlibraries # To print the function
+Loadlibraries() # To call the function
+
+##########################################################################################
+# ISLR CH - 3 Excercises
+
+## Excercise - 8
+
+##########################################################################################
+
+library(ISLR)
+# load Auto data
+# perform a simple linear regression with mpg as the response and horsepower as the predictor.
+
+auto=read.csv("Auto.csv");auto = na.omit(auto);# fix(auto)
+auto$horsepower <- as.numeric(levels(auto$horsepower))[auto$horsepower]
+m1=lm(mpg~horsepower, data = auto); summary(m1); confint(m1)
+
+# 1. Is there a relationship between the predictor and the response?
+
+# Yes, large value of F-statistic (599.7 on 1 and 390 DF) and corresponding small  p-value (< 2.2e-16) suggest the relationship between the predictor and response.
+
+# 2. How strong is the relationship between the predictor and the response?
+
+# Model accuracy is measured by RSE and adjusted R2. 
+# Residual standard error (RSE) is 4.906. 
+# Here, Multiple R-squared is 0.6059 and Adjusted R-squared is  0.6049. 
+# It shows that 60% variablity in the response 'mpg' is explained by 'horsepower' predictor.
+
+# 3. Is the relationship between the predictor and the response positive or negative?
+# Negative. The negative sign of (beta) coefficient (-0.157845) associated with the predictor shows
+# that an increase in 'horsepower' of automobile will result in corresponding decrease in response variable 'mpg'
+
+# 4. What is the predicted mpg associated with a horsepower of 98? 
+# What are the associated 95% confidence and prediction intervals?
+
+predict(m1, data.frame(horsepower = 98), interval = "confidence")
+predict(m1, data.frame(horsepower = 98), interval = "prediction")
+
+# The predicted mpg associated with a horsepower of 98 is 24.46708 units.
+# The associated 95% confidence and prediction intervals are [23.97308, 24.96108] and [14.8094, 34.12476].
+# As expected both intervals are centered at the predicted value (24.46708) but PI is wider than CI
+# The rationale for this is PI also accounts for uncertainty caused by irreducible error
+
+# Plot the response and the predictor. 
+# Use the abline() function to display the least squares regression line.
+
+plot(auto$horsepower, auto$mpg, xlab = "horsepower", ylab = "mpg", main = "mpg Vs horsepower")
+abline (m1,lwd =5, col ="blue") # To add line of WIDTH 3 Colur red
+
+# To produce diagnostic plots of the least squares regression fit
+
+par(mfrow=c(2,2)); plot(m1, main = "m1")
+
+# comments on diagnostic plots
+# 1. residual plots shows a discerible pattern, which indicates presence of non-linearity in the data
+# Some transforms may be useful to deal with non-linearity.
+
+# 2. Normal Q-Q plot shows that residuals are nearly normal. So there is no issue of heteroskasdicity.
+
+# 3. Residual Vs leverage plot shows the presence of leverage point.
+
+m2=lm(mpg~log(horsepower), data = auto); summary(m2); plot(m2, main = "m2")
+m3 = lm(mpg~horsepower+I(horsepower^2), data = auto); summary(m3); plot(m3, main = "m3")
+
+
+##############################################################################################
+
+# Excercise 9 chapter - 3 (using Auto data)
+
+# Produce a scatterplot matrix which includes all of the variables in the data set.
+
+pairs(auto, main = "Auto data")
+
+# Compute the matrix of correlations between the variables except name variable
+
+# perform a multiple linear regression with mpg as the response and all other variables
+# except name as the predictors.
+
+m1 = lm(mpg~.-name, data = auto); summary(m1)
+
+# P-value corresponding to the F-statistic is low which shows that there is relationship between the model.
+# p-values corresponding to the t-statistic of individual predictors show that only displacement, weight, year and origin are significant predictors to the model
+# Coefficient of year variable suggests that with 1 unit increase in year, there is 0.75 unit increase
+# in mpg on an averge while keeping the other predictors fixed.
+
+plot(m1, main = "all variables")
+# Some non-linearity
+# Q_Q plot shows some outliers
+# high leverage points also exists
+
+m2 = lm(mpg~.-name+displacement*weight, data = auto); summary(m2); plot(m2, main="interaction1")
+
+# Residual standard error: 2.964 on 383 degrees of freedom
+# (5 observations deleted due to missingness)
+# Multiple R-squared:  0.8588,  Adjusted R-squared:  0.8558 
+# F-statistic: 291.1 on 8 and 383 DF,  p-value: < 2.2e-16
+
+m3 = lm(mpg~.-name+displacement*weight+horsepower*weight, data = auto); summary(m3); plot(m3, main="interaction2")
+m4 = lm(mpg~.-name+horsepower*weight+I(acceleration^2)+log(displacement), data = auto); summary(m4); plot(m4, main="interaction3 and transformation1")
+m5 = lm(mpg~.-name+horsepower*weight+I(acceleration^2), data = auto); summary(m5); plot(m5, main="interaction & transformation2")
+
+# Comments
+
+
+#####################################################################################################
+
+# Excercise - 10 Chapter - 3 Carseats data set from ISLR package
+library(ISLR); ?Carseats
+fix(Carseats); names(Carseats); summary(Carseats)
+m1 = lm(Sales~Price+Urban+US, data= Carseats); summary(m1)
