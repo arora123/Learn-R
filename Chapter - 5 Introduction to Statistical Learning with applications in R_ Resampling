@@ -1,0 +1,123 @@
+
+###############################################################################################
+
+# Chapter - 5 Resampling
+# Introduction to Statistical Learning with applications in R
+
+###############################################################################################
+
+# Contents
+# Validation set approach (cross-validation)
+# Leave-One-Out Cross-Validation (LOOCV) using cv.glm() function of boot library
+# K-fold CV
+# Bootstrap
+
+
+
+###############################################################################################
+
+# Validation set approach (cross-validation)
+# Using Auto dataset in ISLR package
+
+library(ISLR)
+set.seed(1)  # To set.seed for reproducibility
+dim(Auto) # To find the no of obs(rows) in Auto dataset (392 obs of 9 variables)
+
+# 1.To divide the dataset into training & validation data sets (randomly in equal parts without replacement)
+
+train = sample(392,196); ?sample # To get training data set of 196 obs from total 392 obs
+
+# -train represent validation dataset (Obs of Auto data, which are not included in training)
+# Note: for validation set approach, we equally devide data into training & validation set
+
+# 2. To fit a model on training dataset
+lm.fit =lm(mpg∼horsepower ,data=Auto ,subset =train ); coef(lm.fit) # To fit linear model on training data
+
+# 3. To calculate MSE for test data set
+predict(lm.fit ,Auto) # To predict mpg (to get predicted values of response) by applying this linear model 
+attach(Auto); mpg -predict (lm.fit ,Auto) # To get differences between observed & predicted values of mpg
+attach(Auto); (mpg -predict (lm.fit ,Auto))[-train ] # To get differences between observed & predicted values of mpg for validation set
+attach(Auto); mpg -predict (lm.fit ,Auto))[-train ]^2 # To get square of deviations of observed values from predicted values for validation set
+
+
+attach(Auto); mean((mpg -predict (lm.fit ,Auto))[-train ]^2) # To get MSE (mean squared error) by taking mean of above
+# MSE for linear model is 26.14142
+
+# 4. To find test MSE for quadratic model (fitted on training data)
+lm.fit2 = lm(mpg~horsepower+I(horsepower^2), data=train)
+# OR lm.fit2 = lm(mpg~horsepower+I(horsepower^2), data= Auto, subset = train)
+attach(Auto); mean((mpg- predict(lm.fit2, Auto))[-train]^2)
+# MSE for quadratic model is19.82259
+
+
+# 5. To find test MSE for cubic model (fitted on training data)
+lm.fit3 = lm(mpg~horsepower+I(horsepower^2)+I(horsepower^3), data=train)
+# OR 
+lm.fit3 = lm(mpg~poly(horsepower,3), data= Auto, subset = train)
+attach(Auto); mean((mpg- predict(lm.fit3, Auto))[-train]^2)
+# MSE for quadratic model is 19.78252
+
+## 6. TO REPEAT THE EXPERIMENT ON DIFFERNT TRAINING & VALIDATION SETS
+set.seed(2)
+train = sample(392,196)
+
+# linear model
+lm.fit =lm(mpg∼horsepower ,data=Auto ,subset =train )
+attach(Auto); mean((mpg -predict (lm.fit ,Auto))[-train ]^2)
+# Validation MSE for linear model is 23.29559
+
+# Quadratic model
+lm.fit2 = lm(mpg~horsepower+I(horsepower^2), data= Auto, subset = train)
+attach(Auto); mean((mpg- predict(lm.fit2, Auto))[-train]^2)
+# MSE for quadratic model is 18.90124
+
+# Cubic model
+lm.fit3 = lm(mpg~poly(horsepower,3), data= Auto, subset = train)
+attach(Auto); mean((mpg- predict(lm.fit3, Auto))[-train]^2)
+# MSE for quadratic model is 19.2574
+
+## INTERPRETATION
+
+# A model that predicts mpg using a quadratic function of horsepower performs 
+# better than a model that involves only a linear function of horsepower, and 
+# there is little evidence in favor of a model that uses a cubic function of horsepower
+
+##################################################################################################
+
+# Leave-One-Out Cross-Validation (LOOCV)
+# Using Auto dataset in ISLR package
+
+
+# The LOOCV estimate can be automatically computed for any generalized linear model 
+# using the glm() and cv.glm() functions (in boot library).
+
+# glm() function fits logistic regression by passing the argument family="binomial"
+# glm() fits linear regression without passing in the family argument
+# check the output of the following two
+
+glm.fit=glm(mpg∼horsepower ,data=Auto); coef(glm.fit)
+lm.fit =lm(mpg∼horsepower ,data=Auto); coef(lm.fit)
+
+library(boot) # To load boot library for using cv.glm() ?cv.glm()
+glm.fit=glm(mpg∼horsepower ,data=Auto); 
+cv.err =cv.glm(Auto ,glm.fit); cv.err
+cv.err$delta # The two numbers in the delta vector contain the cross-validation results
+# Result 24.23151 24.23114 both identical upto 2 decimal places
+
+cv.err=rep(0,5)
+for(i in 1:5){
+  glm.fit=glm(mpg∼poly(horsepower,i) ,data=Auto)
+  cv.err[i] = cv.glm(Auto, glm.fit)
+}
+cv.err
+
+
+
+
+
+# K-fold CV
+
+
+
+
+# Bootstrap
