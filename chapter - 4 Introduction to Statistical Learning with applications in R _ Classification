@@ -1,0 +1,113 @@
+# ISLR Book Ch 4 Classification
+
+#######################################################################################
+
+# Logistic Regression using glm() by setting family = binomial
+
+#######################################################################################
+
+library ("ISLR")
+?Smarket; names(Smarket); summary(Smarket); dim(Smarket); fix(Smarket)
+
+# To find the correlation matrix of all variables except "Direction" [9th variable], which is non-metric
+cor(Smarket[, -9])
+
+# little correlation between today’s returns and previous days’ returns
+# and only substantial correlation is between Year and Volume
+
+plot(Smarket$Volume); plot(Smarket$Year, Smarket$Volume)
+
+# To fit a logistic regression model in order to predict Direction using Lag1 through Lag5 and Volume
+# glm() function is used for fitting generalized linear model including logistic regression
+# For fitting logistic regession using glm() function, we must pass argument family=binomial
+
+glm.fit=glm(Direction∼Lag1+Lag2+Lag3+Lag4+Lag5+Volume, data=Smarket ,family =binomial)
+summary (glm.fit )
+
+# The predict() function can be used to predict the probability that 
+# the market will go up, given values of the predictors
+# type ="response" argument is passed to output probabilities of the form P(Y = 1|X), where 1 is for up
+
+# contrats() function is used to get the code for dummy variable
+contrasts(Smarket$Direction)
+glm.probs =predict (glm.fit ,type ="response")
+glm.probs [1:10]
+
+# To make prediction as to wether a market will go up or down on a particular day, 
+# we must convert these predicted probabilities into class labels, Up or Down
+
+# First we create a vector of 1,250 Down elements
+# Then we transform to Up all of the elements for which the predicted probability of a market increase exceeds 0.5.
+
+glm.pred = rep("Down", 1250)
+glm.pred[glm.probs >0.5] = "Up"
+
+# To compute the Confusion matrix using table() function
+
+table(glm.pred, Smarket$Direction)
+# OUTPUT: glm.pred Down  Up
+#            Down  145 141
+#            Up    457 507
+
+# To compute the fraction of days for which the prediction was correct
+mean(glm.pred==Smarket$Direction); (145+507)/1250 # (TP+TN)/Total = 0.5216
+
+# Training error rate = 1 - the fraction of days for which the prediction was correct
+# Training error rate = 1 - 0.5216 =  0.4784
+
+# To split data set into training (observations from 2001 through 2004) Vs Test data (observations from 2005)
+attach (Smarket)
+train = (Year<2005) #Boolean variable, which results TRUE for Rows/observations for which Year < 2005, FALSE otherwise
+Smarket.2005 = Smarket[!train, ] # Subset of Smarket, where train is FALSE, i.e., Deleting the rows for which Year is not < 2005
+dim(Smarket.2005)
+Direction.2005 = Direction[!train]
+
+# To fit logistic regression model on training data "train" subset i.e. before 2005
+glm.fit = glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume, data = Smarket, family = binomial, subset = train)
+
+# To compute predicted probabilities of stock market direction on test data Smarket.2005
+
+glm.probs = predict(glm.fit, Smarket.2005, type = "response")
+ 
+# To convert these predicted probabilities into class labels, Up or Down
+
+glm.pred = rep("Down", 252)
+glm.pred[glm.probs>0.5] = "Up"; dim(glm.pred)
+
+# To create confusion matrix
+
+Direction.2005 = Direction[!train]; dim(Direction.2005)
+table(glm.pred, Direction.2005)
+
+mean(glm.pred== Direction.2005); (77+44)/252
+
+# Test error rate
+
+mean(glm.pred!=Direction.2005); (97+34)/252
+
+# Accuracy rate
+  44/(34+44)
+
+# Another model
+
+glm.fit = glm(Direction~Lag1+Lag2, data = Smarket, family = binomial, subset= train)
+glm.probs = predict(glm.fit, Smarket.2005, type = "response")
+glm.pred = rep("Down", 252)
+glm.pred[glm.probs >0.5] = "Up"
+table = table(glm.pred, Direction.2005)
+mean(glm.pred!=Direction.2005)
+
+# To use caret package for confusion matrix related computations
+  install.packages("caret"); library(caret); install.packages("e1071"); library(e1071)
+confusionMatrix(table)
+
+# To predict Direction on particular days when the vlues of Lag1 and Lag2 is known
+predict (glm.fit ,newdata =data.frame(Lag1=c(1.2 ,1.5), Lag2=c(1.1 , -0.8)),type ="response")
+
+
+#######################################################################################
+
+# Linear Discriminant Analysis LDA using lda() of MASS library
+
+#######################################################################################
+
