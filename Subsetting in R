@@ -1,0 +1,49 @@
+# Contents
+## SUBSETTING A VECTOR
+## SUBSETTING A LIST 
+## SUBSETTING A DATA FRAME
+
+# Note: data.table package provides faster data manipulation in terms of subsetting with simpler code.
+# Explained in Data Manipulation with R_part 3.r file
+#____________________________________________________________________
+
+## SUBSETTING A VECTOR
+
+a <- c(1, 3, 5, 3, 5.5)
+
+# To get a subset of a (only elements in the range 1<a<4)
+a[a > 1 & a < 4] 
+
+# To get an index (position) of numbers which are in the range 1<a<4
+ which(a > 1 & a < 4) 
+
+#When using brackets of the form parent[child], single brackets return an object the same class as the parent 
+#and double brackets returns an object the same class as the child.
+
+## SUBSETTING A LIST 
+
+x <- list(a = list(10, 12, 14), b = c(3.14, 2.81))
+
+# [ ] return an object from object x. So x['a'] returns a list. This list has only one member with name of 'a'.
+x["a"]
+# [[ ]] returns an element of x. [['a']] returns the first element of x, which has a name 'a'. It is a list of length 3, 
+x[["a"]]
+# x$a is equivalent to [['a']]. 
+x$a
+
+## SUBSETTING A DATA FRAME
+
+# From a dataframe, subset where the values of two different columns meet certain criteria
+x <- andy # x is assigned the data frame 'andy'
+x[x[["Col3"]] > 135 & x[["col4"]] < 18 , ]   ## doubts in results
+
+
+x = list(a = 1:5, b="hi")
+y = x["a"]
+y
+
+# To create a data frame
+n = c(2, 3, 5) 
+s = c("aa", "bb", "cc") 
+b = c(TRUE, FALSE, TRUE) 
+df = data.frame(n, s, b)
