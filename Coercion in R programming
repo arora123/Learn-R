@@ -1,0 +1,27 @@
+#The coercion functions don’t automatically reassign the results to the variable.
+
+
+x <- 0:8
+x
+## [1] 0 1 2 3 4 5 6 7 8
+class(x)
+## [1] "integer"
+
+as.numeric(x)
+## [1] 0 1 2 3 4 5 6 7 8
+class(x)
+## [1] "integer"
+class(as.numeric(x))
+## [1] "numeric"
+
+x <- as.numeric(x)
+x
+## [1] 0 1 2 3 4 5 6 7 8
+class(x)
+## [1] "numeric"
+
+x <- as.logical(x)
+x
+## [1] FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+class(x)
+## [1] "logical"
