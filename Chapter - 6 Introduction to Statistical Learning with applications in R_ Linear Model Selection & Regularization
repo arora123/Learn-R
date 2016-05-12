@@ -1,0 +1,120 @@
+# ISLR Book Ch 6 Linear Model Selection and Regularization
+# Lab -1 Subset Selection Methods
+
+Using regsubsets() function from leaps library
+#######################################################################################
+# Contents
+
+# Best Subset Selection
+# Forward and Backward Stepwise Selection
+# Choosing Among Models Using the Validation Set Approach and Cross-Validation
+
+
+#######################################################################################
+# 1. Best Subset Selection
+
+# To predict a baseball player’s Salary on the basis of various statistics
+# associated with performance in the previous year.
+
+library(ISLR)
+?Hitters; fix(Hitters); names(Hitters); dim(Hitteres)
+
+# The is.na() function can be used to identify the missing observations.
+# The sum() function can then be used to count all of the missing elements.
+
+sum(is.na(Hitters$Salary)) # Salary is missing for 59 players
+
+# The na.omit() function removes all of the rows with missing values in any variable.
+
+Hitters = na.omit(Hitters); dim(Hitteres); sum(is.na(Hitters$Salary))
+
+# The regsubsets() function (part of the leaps library) performs best set selection 
+# by identifying the best model that contains a given number of predictors, 
+# where best is quantified using RSS. The syntax is the same as for lm(). 
+# The summary() command outputs the best set of variables for each model size.
+
+library(leaps)
+regfit.full=regsubsets(Salary∼.,Hitters)
+summary(regfit.full)
+
+# An asterisk indicates that a given variable is included in the corresponding
+# model. For instance, this output indicates that the best two-variable model
+# contains only Hits and CRBI. best 3-variable models includes hit, crbi, and Putouts
+
+# By default, regsubsets() only reports results up to the best eight-variable model. 
+# But the nvmax option can be used in order to return as many variables as are desired.
+#  Here we fit up to a 19-variable model.
+
+regfit.full=regsubsets(Salary∼.,data=Hitters ,nvmax =19)
+reg.summary =summary(regfit.full) 
+names(reg.summary) # The summary() function also returns R2, RSS, adjusted R2, Cp, and BIC.
+
+reg.summary$rsq 
+
+# As expected, the R2 statistic increases monotonically as more variables are included.
+reg.summary$adjr2; reg.summary$which; reg.summary$rss; reg.summary$outmat; reg.summary$obj
+
+# Plotting RSS, adjusted R2, Cp, and BIC for all of the models at once will help us decide which model to select.
+# The type="l" option tells R to connect the plotted points with lines.
+
+par(mfrow =c(2,2)) # To divide ploting area in 2 X 2 grid
+plot(reg.summary$rss, xlab="Number of variables", ylab= "RSS", type="l")
+plot(reg.summary$adjr2, xlab="Number of variables", ylab="Adjuested R squared", type="l")
+
+# The points() command works like the plot() command, except that it
+# puts points on a plot that has already been created, instead of creating a new plot. 
+# The which.max() function can be used to identify the location of the maximum point of a vector.
+
+which.max(reg.summary$adjr2) # Output 11
+points (11, reg.summary$adjr2[11], col ="red",cex =2, pch =20)
+coef(regfit.full ,11) # To see the coefficient estimates associated with this model
+
+# To plot the Cp and BIC statistics, and indicate the models with the smallest statistic using which.min().
+
+which.min(reg.summary$cp) # # Output shows the model with the lowest Cp is 10 variable model
+plot(reg.summary$cp, xlab="Number of variables", ylab="Cp", type="l")
+points(10, reg.summary$cp[10], col="red",cex =2, pch =20)
+coef(regfit.full ,10) # To see the coefficient estimates associated with this model
+
+
+which.min(reg.summary$bic) # Output shows the model with the lowest BIC is the six-variable model
+plot(reg.summary$bic, xlab="Number of variables", ylab="BIC", type="l")
+points(6, reg.summary$bic[6], col="red",cex =2, pch =20)
+coef(regfit.full ,6) # To see the coefficient estimates associated with this model
+
+
+
+# The regsubsets() function has a built-in plot() command which can
+# be used to display the selected variables for the best model with a given
+# number of predictors, ranked according to the BIC, Cp, adjusted R2, or AIC.
+?plot.regsubsets()
+
+plot(regfit.full, scale="r2")
+plot(regfit.full, scale="bic")
+plot(regfit.full, scale=c("r2", "bic"))
+
+
+############################################################################################
+
+# 2. Forward and Backward Stepwise Selection
+
+# regsubsets() function also performs forward stepwise or backward stepwise selection,
+# using the argument method="forward" or method="backward".
+
+regfit.fwd= regsubsets(Salary~.,data=Hitters, nvmax=19, method = "forward")
+summary(regfit.fwd)
+regfit.bwd= regsubsets(Salary~.,data=Hitters, nvmax=19, method = "backward")
+summary(regfit.bwd)
+
+# For this data, the best one-variable through sixvariable
+# models are each identical for best subset and forward selection.
+# However, the best seven-variable models identified by forward stepwise selection,
+# backward stepwise selection, and best subset selection are different.
+
+coef(regfit.full, 7)
+coef(regfit.fwd, 7)
+coef(regfit.bwd, 7)
+
+###############################################################################################
+
+# 3. Choosing Among Models Using the Validation Set Approach and Cross-Validation
