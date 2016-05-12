@@ -1,0 +1,46 @@
+### R Programming Coursera Assignment - 1
+## Part - 1 pollutantmean
+
+#Write a function named 'pollutantmean' that calculates the mean of a pollutant 
+#(sulfate or nitrate) across a specified list of monitors (332 monitor i.e., 332 cv files). 
+#The function 'pollutantmean' takes three arguments: 'directory', 'pollutant', and 'id'. 
+#Given a vector monitor ID numbers, 'pollutantmean' reads that 
+#monitors' particulate matter data from the directory specified in the 'directory' argument 
+# and returns the mean of the pollutant across all of the monitors, 
+#ignoring any missing values coded as NA. 
+
+unzip("specdata.zip", exdir = getwd())
+
+# To store all 332 files (for 332 monitors) in an object "file_list"
+file_list = list.files("specdata", full.names=TRUE)
+file_list # To print file_list
+str(file_list) # To see the structure of file_list
+class(file_list) # TO see the class of object file_list
+subset1 <- file_list[1:10]
+subset1[ ,3]
+
+## ALTERNATE WAY is 
+directory <- "specdata" 
+## 'directory' is a character vector of length 1 indicating
+## the location of the CSV files
+file_list <- list.files(directory)
+
+pollutant <- "sulfate"
+## 'pollutant' is a character vector of length 1 indicating
+## the name of the pollutant for which we will calculate the
+## mean; either "sulfate" or "nitrate".
+
+id = 1:332 ## 'id' is an integer vector indicating the monitor ID numbers to be used
+
+comp_file <- data.frame()
+pollutantmean <- function(directory, pollutant, id = 1:332) {
+  
+  for (i in 1:332) {
+    comp_file <- rbind(comp_file, read.csv(file_list[i]))
+  }
+  
+  means <- mean(comp_file$pollutant, na.rm = True)  
+  means 
+  ## Return the mean of the pollutant across all monitors list
+  ## in the 'id' vector (ignoring NA values)
+  }
