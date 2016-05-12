@@ -1,0 +1,84 @@
+# Functions
+# functions are objects in R of class ‘function’.
+
+
+
+# Multiple of 3
+myfun1 = function(x){
+  x*3
+}
+myfun1(4)
+class(myfun1)
+
+#Perimeter of rectangle
+myfun2 <- function(length, width){
+  area = length*width
+  perimeter = 2*(length + width)
+  return perimeter
+  
+}
+myfun2(2, 3)
+
+# Roots of quadratic equation
+myfun3 = function(a, b, c){
+  root = (- b + ((b^2) - 4*a*c))/(2*a)
+  root
+}
+myfun3(1, -4, 4)
+myfun3(1, 4, 4)
+
+# myfun4 = function(x){
+#   if x >=5 {
+#     x = 0
+#   } else {
+#     x = x + 1
+#   }
+#   x
+# }
+# myfun4(1)
+# myfun4(3)
+# myfun4(5)
+# myfun4(7)
+# myfun4(-11)
+# mufun4(inf)
+
+# To calculate numbers above 10 in a sequence
+above10 = function(x){
+  use = x > 10
+  x[use]
+}
+above10(1:15)
+
+# To calculate numbers above n in a sequence
+aboven = function(x, n){
+  use = x > n
+  x[use]
+}
+aboven(1:15, 9)
+
+# To calculate numbers above 10 in a sequence by assigning a fixed value to parameter 'n'
+above10_new = function(x, n = 10){
+  use = x > n
+  x[use]
+}
+above10_new(1:15)
+
+
+# To calculate means of every coulmn of a matrix
+column_mean = function(y){                                     # Here argument y is a matrix
+  nc = ncol(y)                                                 # Here nc represents the number of columns in a given matrix y
+  
+  for (i in 1:nc){                                             # index i takes values from 1 to nc
+    means <- numeric (nc)
+    means[i] = mean(y[ ,i])                                     # for every column i, it calculates means of subset of y (i.e.) column i    
+    }
+y = matrix(1:9, 3, 3)
+print y
+column_mean(y)
+
+
+# lazy evaluation
+f= function(a,b){
+  a^3
+}
+ # any functionwith ... arguments, anything after ... needs to be named explicitly. e.g., paste function - no partial matching
