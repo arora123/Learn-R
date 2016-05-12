@@ -1,0 +1,256 @@
+######################################################################################
+
+# Chapter - 2 Introduction to Statistical Learning with applications in R
+
+######################################################################################
+# Concepts
+
+### vectors, data, matrices, subsetting
+x=c(2,7,5)
+x
+y=seq(from=4,length=3,by=3)
+?seq
+y
+x+y
+x/y
+x^y
+x[2]
+x[2:3]
+x[-2]
+x[-c(1,2)]
+z=matrix(seq(1,12),4,3)
+z
+z[3:4,2:3]
+z[,2:3]
+z[,1]
+z[,1,drop=FALSE]
+dim(z)
+ls()
+rm(y)
+ls()
+### Generating random data, graphics
+x=runif(50)
+y=rnorm(50)
+plot(x,y)
+plot(x,y,xlab="Random Uniform",ylab="Random Normal",pch="*",col="blue")
+par(mfrow=c(2,1))
+plot(x,y)
+hist(y)
+par(mfrow=c(1,1))
+### Reading in data
+Auto=read.csv("Auto.csv")
+pwd()
+Auto=read.csv("../Auto.csv")
+names(Auto)
+dim(Auto)
+class(Auto)
+summary(Auto)
+plot(Auto$cylinders,Auto$mpg)
+plot(Auto$cyl,Auto$mpg)
+attach(Auto)
+search()
+plot(cylinders,mpg)
+cylinders=as.factor(cylinders)
+plot(cylinders,mpg,xlab="Cylinders",ylab="Mpg",col="red")
+pdf(file="../mpg.pdf")
+plot(cylinders,mpg,xlab="Cylinders",ylab="Mpg",col="red")
+dev.off()
+pairs(Auto,col="brown")
+pairs(mpg~cylinders+acceleration+weight,Auto)
+q()
+
+###################################################################################################
+
+
+# The rnorm() function generates a vector of random normal variables,with first argument n the sample size
+rnorm(2, 0, 1)
+
+?rnorm()
+
+# If mean or sd are not specified they assume the default values of 0 and 1, respectively.
+x=rnorm (50)
+y=x+rnorm (50, mean=50, sd=.1); x; y
+
+# to compute the correlation between x & y
+cor(x,y)
+
+?set.seed()
+
+# to reproduce the exact same set of random numbers # run these two command together
+# The set.seed()function takes an (arbitrary) integer argument.
+set.seed (3)
+rnorm (5)
+
+
+# Get some random numbers
+rnorm(20)
+
+# Get some more random numbers
+rnorm(20)
+
+#They shouldn't be the same numbers...
+#If we want to be able to reproduce our works 
+#later it would be nice if we would get the same numbers
+
+#Let's set a seed first
+set.seed(2)
+
+rnorm(20)
+
+#Now if we want the same random numbers
+#we can just set the seed to the same thing
+set.seed(2)
+
+rnorm(20)
+
+# Different sets of random numbers can be generated using different arguments
+# Try by repeating the following code, then again run the previous code
+set.seed(3)
+
+rnorm(20)
+
+# To calculate mean, variance and standard deviation
+set.seed (3)
+y=rnorm (100)
+mean(y)
+var(y)
+sqrt(var(y))
+sd(y)
+
+#To get a sctter plot and correlation of data in R
+# more about plotting http://www.r-bloggers.com/tutorial-using-plot-function/ 
+# http://stackoverflow.com/questions/26091323/how-to-plot-a-function-curve-in-r
+?plot
+x = rnorm(100); y=rnorm(100)
+plot(x,y); cor(x,y)
+plot(x, y, xlab = "var1", ylab = "var2", main = "x Vs Y plot", type = "l", asp=y/y)
+
+
+###################################################################################################
+# Practice excerises
+
+## Excercise - 8
+
+getwd()
+setwd("D:/Learning/Books data science/Data Introduction to statistical learning R") # Or use ctr+shift+H
+college= read.csv("College.csv") # To assign a data frame (saved in a csv file) to 'college'
+fix(college) # To view 'college data frame in data editor window
+?fix(); ?rownames()
+rownames(college) = college[,1] # for data frame 'college' assign rownames the entries in for column
+fix(college) # To view 'college data frame in data editor window
+college = college[, -1] # To remove forst column from data fram
+fix(college) # I column is visible but not included in calculations, it represents row names only
+summary(college) # To produce summary of 'college' data frame
+names(college) # To view names of variables in college data frame
+pairs(~ perc.alumni+Expend+Grad.Rate, college) # to produce a scatterplot matrix of three variables of the data
+pairs(college) # to produce a scatterplot matrix of all pairs of variables of the data
+pairs(college[,1:10]) # to produce a scatterplot matrix of the first ten columns or variables of the data
+plot(college$Private, college$Outstate, xlab= "Private", ylab="Outstate", main="Outstate versus Private") # Plot function will produce box plots as Private is categorical variable
+attach(college); plot(Private, Outstate) # Alternate way to plot
+?rep()
+Elite=rep("No", nrow(college)); Elite # To assign value "No" (for each row of college data frame) to Elite varaible
+Elite[college$Top10perc > 50] = "Yes"; Elite # To assign value "Yes" for rows, where Top10perc > 50
+Elite=as.factor(Elite); Elite # To convert Elite in categorical variable
+college=data.frame(college, Elite); fix(college) # To assign the object college, a new data frame adding Elite variable to previous college data frame
+summary(Elite) # To see the summary of Elite variable
+
+plot(college$Elite, college$Outstate, xlab="Elite", ylab="outstate", main="Outstate versus Elite")
+
+par(mfrow=c(2,2))
+hist(Apps, col=1); hist(Accept, col="red"); hist(Enroll, col=3); hist(Top10perc, col=5)
+
+par(mfrow=c(2,2))
+hist(college$Apps); hist(college$perc.alumni, col=2); hist(college$S.F.Ratio, col=3, breaks=10); hist(college$Expend, breaks=100)
+
+# Part vi (Some interesting observations):
+
+college[which.max(college$Top10perc),] # what is the university with the most students in the top 10% of class
+
+acceptance_rate = college$Accept / college$Apps
+
+college[ which.min( acceptance_rate ), ] # what university has the smallest acceptance rate
+
+college[ which.max( acceptance_rate ), ] # what university has the most liberal acceptance rate
+
+
+
+par(mfrow=c(1,1))
+plot(college$Outstate, college$Grad.Rate)
+# High tuition correlates to high graduation rate.
+plot(college$Accept / college$Apps, college$S.F.Ratio)
+# Colleges with low acceptance rate tend to have low S:F ratio.
+plot(college$Top10perc, college$Grad.Rate)
+# Colleges with the most students from top 10% perc don't necessarily have
+# the highest graduation rate. Also, rate > 100 is erroneous!
+
+
+
+###################################################################################################################
+m0 <- cbind(1:4, 2, 2); m0
+rownames(m0) = c(7,8,9,10)
+fix(m0); m0
+m0 = m0[,-1]
+fix(m0)
+
+#################################################################################################################
+
+## Excercise - 9
+
+auto=read.csv("Auto.csv", header=T, na.string = "?"); fix(auto) # To load and view data
+auto=na.omit(auto); summary(auto); names(auto)
+# Quantitative predictors = mpg, displacement, horsepower, weight, acceleration, year
+# Qualitative predictors = cylinders, origin, name
+as.factor(auto$cylinders); as.factor(auto$origin); as.factor(auto$name)
+summary(auto)
+range(auto$mpg); range(auto$displacement); range(auto$horsepower); range(auto$weight); range(auto$acceleration); range(auto$year)
+
+
+# To find range, mean, sd of only quantitative variables using sapply
+?sapply()
+qualitative_columns = c(2,8,9) # 2, 8 and 9th columns are assigned to qualitative_columns
+sapply( auto[,-qualitative_columns], range ) # To apply range function to the object auto after indexing (removing qualitative_columns)
+sapply( auto[,-qualitative_columns], mean )
+sapply( auto[,-qualitative_columns], sd )
+
+# OR
+quantitative_columns = c(1,3,4,5,6,7) # These columns are assigned to quantitative_columns
+sapply( auto[,quantitative_columns], range )  # To apply range function to the object auto after subsetting (taking only quantitative_columns)
+sapply( auto[,quantitative_columns], mean )
+sapply( auto[,quantitative_columns], sd )
+
+?seq()
+seq(10, 85) # To generate sequence of 10 through 85th observation
+
+sapply( auto[-seq(10, 85),-qualitative_columns], range ) # To apply range function to the object auto after subsetting removing rows 10 to 85 and  qualitative_columns
+sapply( auto[-seq(10, 85),-qualitative_columns], mean )
+sapply( auto[-seq(10, 85),-qualitative_columns], sd )
+
+## Plots
+
+plot(auto$displacement , auto$mpg ) # mpg decreases with increase in displacement
+plot(auto$horsepower , auto$mpg )   # mpg decreases with increase in horsepower
+plot(auto$weight , auto$mpg )       # mpg decreases with increase in weight
+plot(auto$acceleration , auto$mpg ) # mpg increases with increase in weight  
+plot(auto$year , auto$mpg )   
+plot(as.factor(auto$cylinders) , auto$mpg )   
+plot(as.factor(auto$origin) , auto$mpg )
+?lm()
+attach(auto)
+model1=lm(mpg~acceleration-(displacement+horsepower+weight))
+summary(model1)
+
+#################################################################################################################
+
+## Excercise - 10
+
+library(MASS)
+Boston
+?Boston # To read about Bostin data set
+# How many rows are in this data set? How many columns? The Boston data frame has 506 rows and 14 columns.
+# What do the rows and columns represent? column description can be read
+all_correlations = cor( Boston ); all_correlations 
+print( all_correlations[,14] )
+cols = c(14,13,6,11,3,10)
+pairs( Boston[,cols] )
+# Look how the variable most correlated to crim (turns out to be rad)
+plot( Boston[,1], Boston[,9] )
