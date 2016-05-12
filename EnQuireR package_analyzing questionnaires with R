@@ -1,0 +1,32 @@
+# EnQuireR package: analyzing questionnaires with R
+
+install.packages("EnQuireR"); library(EnQuireR) # To install & load EnQuireR package
+data(tea); ?car; fix(tea); summary(tea); names(tea) # To load and view data & it's summary
+
+# To export tea data in excel file
+library(xlsx); write.xlsx(tea, "D:/Learning/Learn R/R_programming data and codes/teadataquestionnair.xlsx")
+
+?ENbarplot() # Function for plots of categorical variables
+
+ENbarplot(tea, 20, numr=1, numc=1, spl=TRUE)
+
+## this function shoud be powerful ,but it doesn't work in my PC, #Error in hsv(h = a * i, s = 1, v = 1, 1, 1) : unused argument(s) (1)
+#but don't worry,in package ggplot2,function 'qplot' also can do this ,though it's not horizontal bar #chart
+library(ggplot2)
+qplot(socio.professional.category,fill=sex,data=tea)
+
+XvsYbarplot("socio.professional.category","sex",tea, legend.text=TRUE)
+plot()
+
+ 
+# To test association between set of variables
+# I group(usage & attitude)-variables 13 to 17 and II group (perception)-variables 31:35 (last 5 columns)  
+?chisq.desc() 
+chisq.desc(tea, 13:17,31:35)
+# cells are coloured in light red when the p-value associated with the test is significant
+
+?MCA(); res <- MCA(tea[,1:18]); ENlisib(res,0.05,50,c(1,2))
+ENdensity(res); ENMCA(tea[,1:18])
+
+install.packages("fifer"); library(fifer)
+chisqPostHoc(mobile1[[]])
