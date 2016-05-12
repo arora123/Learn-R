@@ -1,0 +1,109 @@
+## Contents
+# Logical Arithmetic
+# Combinations of TRUE and FALSE
+# To generate repeats of numbers or characters using rep() function
+# To generate Factor Levels
+# To generate Regular Sequences of Numbers
+# The sequence function
+# Sorting, Ranking and Ordering
+# The sample Function
+
+
+
+
+# Logical Arithmetic
+# Logical arithmetic is particularly useful in generating simplified factor levels during statistical modeling
+
+x<-0:6; x; runif(7) # runif(n, min = 0, max = 1) generates n random values between 0 and 1
+x<4 # To check if x less than 4
+all(x>0) # To check if all the x values bigger than 0
+any(x<0) # To check if any of the x values is negative
+sum(x<4) # To count the true values of (x<4) i.e. the values of x which are less than 4
+y = (x<4)*runif(7); y # To multiply (x<4) by other vector     
+# WHY first value is not zero? - x<4 is logical object, it returns 1 if true, else it return 0
+y = (x<4)*3); y # To multiply (x<4) by a number 3, it returns (1 1 1 1 0 0 0)*3
+
+y = (x<4)*c(2,3,5,-3); y # To multiply (x<4) by other vector, say, c(2, 3, 5, -3)     
+y = c(2, 3, 4, 1); z = (x<4)*y; z;  
+
+# To generate simplified factors using logical arithmetic # Ref: The R book page 33
+(treatment<-letters[1:5]) # treatment<-letters[1:5]; treatment # To generate a five-level factor called treatment
+as.character(treatment) # To get the factor levels 
+
+?factor() # The function factor is used to encode a vector as a factor
+t2 = factor(1+(treatment=="b")); t2 # To change the factor level of b as 2; as by default t2 takes value 1 for all factor levels
+t2 = factor(2+(treatment=="b")); t2 # To change the factor level of b as 3; as by default t2 takes value 2 for all factor levels
+
+# To reduce 'treatment' to a 3 level factor called t2
+# By lumping together the levels a and e (new factor level 1) and c and d (new factor level 3) while leaving b distinct (with new factor level 2)
+t2 = factor(1+(treatment=="b")+2*(treatment=="c")+2*(treatment=="d")); t2
+
+# Combinations of TRUE and FALSE
+x <- c(NA, FALSE, TRUE) # All the possible outcomes expressed as a logical vector called x
+names(x) <- as.character(x); names(x)
+
+outer(x,x,"&") # To get truth table for logical AND using outer function
+# NA & FALSE evaluates to FALSE        
+
+outer(x,x,"|") # To get truth table for logical OR using outer function
+# NA & TRUE evaluates to TRUE        
+
+# To generate repeats of numbers or characters using rep() function
+
+rep(9,5) # To generate five 9s
+rep(1:3,2); rep(3:1, 3) # To repeat a sequence twice/ thrice
+rep(1:4, each = 2); rep(1:4, each = 3) # To repeat each element of a sequence twice/ thrice
+rep(1:4, each = 2, 3); rep(1:4, each = 2, times = 3) # To repeat each number of a sequence twice and to repeat whole series thrice
+rep(1:4, 1:4) # To get one 1, two 2s, three 3s and four 4s 
+# NOTE: Here, the second argument must be a vector of the same length as the vector comprising the first argument
+rep(1:4, c(4,2,1,3)) # To repeat each element of a series, different number of times
+rep(c(1,3,5), c(3,2,4)) # To repeat each element of a series, different number of times
+
+
+# To generate Factor Levels
+
+# The generate levels function gl() is useful to encode long vectors of factor levels
+# gl('up to', 'with repeats of', 'to total length') to get factor levels up to 4 with repeats of 3 repeated only once (i.e. to total length=12)
+gl(4,3); gl(3,4); gl(3,4,20); gl(3,4,2)
+gl(4,3,24)
+
+gl(3,2,24,labels=c("A","B","C")) # To get text for the factor levels, rather than numbers using lebels
+
+
+# Generating Regular Sequences of Numbers
+
+# To generate regularly spaced sequences, often involving integers using colon
+10:18; 18:10; -0.5:8.5; 3.7:-1.3 # Default interval is 1.0
+3.7:-1.7; -0.5:5 # NOTE: sequence stops before the secomd argument, if the increment does not match exactly
+
+# seq(intial, final, increament) to get a sequence with given increament/decreament
+seq(1,12,2); seq(15,0,-3)
+
+seq(2,12,(12-2)/100) # To generate a sequence of 100 equally spaced numbers between 2 and 12
+x = c(1, 2001); seq(min(x), max(x), (max(x)-min(x))/100) # To generate 100 values of x between min(x) and max(x)
+
+# To create a sequence of the same length as an existing vector using along
+x<-rnorm(18,10,2); x # A vector of 18 random numbers from normal distribution with parameters 10 and 2
+seq(10, 50, along=x) # To get a sequence starting at EXACT 10, ending at EXACT 50 with eaxctly 18 elements (length of x)
+
+# The sequence function
+sequence(4)
+sequence(4:2) # To concatenate several sequences
+sequence(c(5,2,4))
+
+
+# Sorting, Ranking and Ordering
+#?? DATA SEE MORE THE R BOOK
+x = c(2,5,7,4,12,9,6,3); x; length(x)
+sort(x); rev(sort(x)) # To sort in increasing order and decreasing order
+rank(x) # To rank the numbers as we do for rank correlation
+order(x); rev(order(x)) # To get an order of indices of numbers in increasing order and decreasing order  
+
+
+
+# The sample Function
+x = c(2,5,7,4,12,9,6,3); x
+sample(x) # To shuffle all elements of x randomly every time WITHOUT REPLACEMENT
+sample(x, replace=T) # To shuffle all elements of x randomly every time WITH REPLACEMENT
+sample(x,3); sample(x,3,replace=T) # To get a sample of x containing 3 elements without/with replacement
+
