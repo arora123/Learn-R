@@ -6,7 +6,7 @@
 
 ###############################################################################################
 
-# Basic of lm() function [MASS and ISLR library] Regression for quantitative predictors
+# Basic of lm() function [Base package] Regression for quantitative predictors
 # Multiple linear regression [car package for VIF]
      # Interaction term
      # NON_LINEAR TRANSFORMATIONS OF PREDICTORS
