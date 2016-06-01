@@ -1,0 +1,72 @@
+# HYPOTHESIS TESTING
+## Tests for population mean
+
+
+# One Sample T-Test -------------------------------------------------------
+
+#Example-1
+# Two sided hypothesis test
+# Null: true mean = mu; Alternative: true mean != mu
+
+s = 1:20
+
+# Or s = seq(1, 20, by=1)
+
+shapiro.test(s) # To test normality of data
+a = t.test(s, alternative="two.sided", mu = 10, conf.level = 0.95)
+
+a$
+  
+a$statistic 
+a$parameter
+a$null.value
+a$alternative
+
+# let hypothesized population mean = 10
+# To compute mean & sd of sample
+# mean(s); sd(s); 
+# To compute t-statistics manually; 
+# mu = 10
+# t = (mean(s)-mu)/(sd(s)/sqrt(length(s)))
+# To compute p-value manually
+# p_val = 2*pt(-abs(t), df = (length(s)-1))
+# We need the abs() function because otherwise you run the risk of getting p-values bigger than 11 
+# (when the mean of the data is much bigger than the given mean)!
+
+
+####
+# One sided tests
+# Null: true mean = mu; Alternative: true mean >= 10
+
+b = t.test(s, alternative="greater", mu = 10, conf.level = 0.95)
+
+# Null: true mean = mu; Alternative: true mean <= 10
+
+c = t.test(s, alternative="less", mu = 10, conf.level = 0.95)
+
+
+# Independent Sample T-test -----------------------------------------------
+#Example-1
+# Two sided hypothesis test
+# Null: mu1 = mu2; Alternative: mu1 != mu2
+
+x = 1:40; y = seq(20, 40, by=2)
+
+# CHECKING FOR ASSUMPTIONS
+shapiro.test(x); shapiro.test(y) # Normality test
+var.test(x,y)  # Homoskedasticity test
+
+
+t.test(x, y, conf.level = 0.95, var.equal=TRUE)
+# This code is similar to these codes, as alternative="two.sided", and paired=FALSE are default options
+t.test(x, y, alternative="two.sided", conf.level = 0.95, var.equal=TRUE)
+t.test(x, y, alternative="two.sided", conf.level = 0.95, paired=FALSE, var.equal=FALSE, var.equal=TRUE)
+
+# If population variances are not equal
+t.test(x, y, alternative="two.sided", conf.level = 0.95, paired=FALSE)
+# Or
+t.test(x, y, alternative="two.sided", conf.level = 0.95, paired=FALSE, var.equal=FALSE)
+
+
+# Paired Sample T-Test ----------------------------------------------------
+# Use paired=TRUE option
