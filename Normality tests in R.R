@@ -16,7 +16,7 @@ hist(data2, 10, col='red')
 
 ## To look at a qqplot
 qqnorm(data1);qqline(data1, col = 2)
-qqnorm(data2);qqline(data2, col = 2)
+qqnorm(data2);qqline(data2, col = 3)
 # Shows data1 is normal, data2 is not
 
 # Statistical Tests -------------------------------------------------------
@@ -55,4 +55,23 @@ kurtosis.test(data1); kurtosis.test(data2)
 
 skew.test(data1); skew.test(data2)
 
-# Other normality tests can be found in nortest package
+
+install.packages("nortest"); library(nortest)
+#Perform Anderson-Darling normality test
+ad.test(data1); ad.test(data2)
+# Shows data1 is normal, data2 is not
+
+# Perform Cramer-von Mises test for normality
+cvm.test(data1); cvm.test(data2) 
+# Shows data1 is normal, data2 is not
+
+#Perform Pearson chi-square test for normality
+pearson.test(data1); pearson.test(data2)
+# Shows data1 is normal, data2 is not
+
+#Perform Shapiro-Francia test for normality
+sf.test(data1); sf.test(data2)
+# Shows data1 is normal, data2 is not
+
+# Other normality tests can be found in normtest package at 
+# https://cran.r-project.org/web/packages/normtest/normtest.pdf
