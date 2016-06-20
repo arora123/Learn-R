@@ -11,6 +11,7 @@
 # Leave-One-Out Cross-Validation (LOOCV) using cv.glm() function of boot library
 # K-fold CV
 # Bootstrap
+# Practice Excercises
 
 
 
@@ -26,7 +27,7 @@ dim(Auto) # To find the no of obs(rows) in Auto dataset (392 obs of 9 variables)
 # 1.To divide the dataset into training & validation data sets (randomly in equal parts without replacement)
 
 train = sample(392,196); ?sample # To get training data set of 196 obs from total 392 obs
-
+  
 # -train represent validation dataset (Obs of Auto data, which are not included in training)
 # Note: for validation set approach, we equally devide data into training & validation set
 
@@ -36,22 +37,22 @@ lm.fit =lm(mpg∼horsepower ,data=Auto ,subset =train ); coef(lm.fit) # To fit l
 # 3. To calculate MSE for test data set
 predict(lm.fit ,Auto) # To predict mpg (to get predicted values of response) by applying this linear model 
 attach(Auto); mpg -predict (lm.fit ,Auto) # To get differences between observed & predicted values of mpg
-attach(Auto); (mpg -predict (lm.fit ,Auto))[-train ] # To get differences between observed & predicted values of mpg for validation set
-attach(Auto); mpg -predict (lm.fit ,Auto))[-train ]^2 # To get square of deviations of observed values from predicted values for validation set
+attach(Auto); (mpg - predict (lm.fit ,Auto))[-train ] # To get differences between observed & predicted values of mpg for validation set
+attach(Auto); (mpg - predict (lm.fit ,Auto))[-train ]^2 # To get square of deviations of observed values from predicted values for validation set
 
 
 attach(Auto); mean((mpg -predict (lm.fit ,Auto))[-train ]^2) # To get MSE (mean squared error) by taking mean of above
-# MSE for linear model is 26.14142
+# MSE for linear model for validation set is 26.14142 [estimated test MSE]
 
 # 4. To find test MSE for quadratic model (fitted on training data)
-lm.fit2 = lm(mpg~horsepower+I(horsepower^2), data=train)
+lm.fit2 = lm(mpg~horsepower+poly(horsepower, 2), data=Auto, subset = train)
 # OR lm.fit2 = lm(mpg~horsepower+I(horsepower^2), data= Auto, subset = train)
 attach(Auto); mean((mpg- predict(lm.fit2, Auto))[-train]^2)
-# MSE for quadratic model is19.82259
+# MSE for quadratic model is 19.82259
 
 
 # 5. To find test MSE for cubic model (fitted on training data)
-lm.fit3 = lm(mpg~horsepower+I(horsepower^2)+I(horsepower^3), data=train)
+lm.fit3 = lm(mpg~horsepower+I(horsepower^2)+I(horsepower^3), data=Auto, subset = train)
 # OR 
 lm.fit3 = lm(mpg~poly(horsepower,3), data= Auto, subset = train)
 attach(Auto); mean((mpg- predict(lm.fit3, Auto))[-train]^2)
@@ -100,24 +101,261 @@ lm.fit =lm(mpg∼horsepower ,data=Auto); coef(lm.fit)
 
 library(boot) # To load boot library for using cv.glm() ?cv.glm()
 glm.fit=glm(mpg∼horsepower ,data=Auto); 
-cv.err =cv.glm(Auto ,glm.fit); cv.err
+cv.err =cv.glm(Auto ,glm.fit); ?cv.glm()
 cv.err$delta # The two numbers in the delta vector contain the cross-validation results
-# Result 24.23151 24.23114 both identical upto 2 decimal places
+# Result 24.23151 24.23114 both identical upto 2 decimal places 
+# Cross validation estimate of test error is 24.23 
 
+# To repeat this procedure for increasingly complex polynomial fits (up to order 5)
 cv.err=rep(0,5)
 for(i in 1:5){
   glm.fit=glm(mpg∼poly(horsepower,i) ,data=Auto)
-  cv.err[i] = cv.glm(Auto, glm.fit)
+  cv.err[i] = cv.glm(Auto, glm.fit)$delta[1]
+}
+cv.err
+# Output
+# 24.23151 19.24821 19.33498 19.42443 19.03321
+
+# for delta[2]; output 24.23114 19.24787 19.33448 19.42371 19.03242
+
+#Interpretation:
+# A sharp drop in the estimated test MSE between the linear and quadratic fits, 
+# but then no clear improvement from using higher-order polynomials.
+
+
+##################################################################################################
+
+# k_Fold Cross-Validation (k_Fold CV)
+# Using Auto dataset in ISLR package
+
+
+
+set.seed (17)
+cv.error.10= rep (0,10)
+for (i in 1:10) {
+   glm.fit=glm(mpg~poly(horsepower,i),data=Auto)
+   cv.error.10[i]=cv.glm (Auto, glm.fit, K=10)$delta [1]
+   }
+cv.error.10
+# Output
+#  24.20520 19.18924 19.30662 19.33799 18.87911 19.02103 18.89609 19.71201 18.95140 19.50196
+
+# Much faster computation than LOOCV
+
+#Interpretation:
+# Little evidence that using cubic or higher-order polynomial terms leads to lower test error 
+# than simply using a quadratic fit.
+
+
+##################################################################################################
+
+# Bootstrap
+# Using Portfolio & Auto datasets in ISLR package
+
+# Bootstraping can be done in two steps:
+#   1. Create a function that computes the statistic of interest.
+#   2. Use the boot() function [from 'boot' library], to perform the bootstrap 
+#     by repeatedly sampling observations from the data set with replacement.
+
+
+#Example_1
+# Estimating the Accuracy of a Statistic of Interest
+data=Portfolio
+
+# To create a function to compute alpha
+
+alpha.fn=function (data ,index){
+    X=data$X [index]
+    Y=data$Y [index]
+    return ((var(Y)-cov (X,Y))/(var(X)+var(Y) -2* cov(X,Y)))
+   }
+
+alpha.fn(Portfolio ,1:100) # Output is 0.5758321
+
+
+# To randomly select 100 observations from the range 1 to 100, with replacement. 
+# This is equivalent # to constructing a new bootstrap data set and 
+# recomputing ˆα based on the new data set.
+
+set.seed (1)
+alpha.fn(Portfolio ,sample (100 ,100 , replace =T)) # Output is 0.5963833
+
+# We can implement a bootstrap analysis by performing this command many times,
+# recording all of the corresponding estimates for α, & computing the resulting S.D.
+# boot() automates this approach
+
+# To produce R = 1, 000 bootstrap estimates for α
+
+library(boot); boot(data, alpha.fn, R = 1000); # Estimate of α = 0.5758321 and s.d. is 0.08861826
+
+# ORDINARY NONPARAMETRIC BOOTSTRAP
+# 
+# 
+# Call:
+#   boot(data = data, statistic = alpha.fn, R = 1000)
+# 
+# 
+# Bootstrap Statistics :
+#   original        bias    std. error
+# t1* 0.5758321 -7.315422e-05  0.08861826
+
+# Example_2
+
+# Estimating the Accuracy of a Linear Regression Model
+
+
+boot.fn=function (data ,index )
+   return (coef(lm(mpg∼horsepower ,data=data ,subset =index)))
+boot.fn(Auto ,1:392)
+
+
+set.seed (1)
+boot.fn(Auto ,sample (392 ,392 , replace =T))
+
+boot(Auto ,boot.fn ,1000)
+
+
+summary (lm(mpg∼horsepower ,data=Auto))$coef
+
+# Example_3
+
+# Estimating the Accuracy of a quadratic model
+
+boot.fn=function (data ,index )
+  coefficients(lm(mpg∼horsepower +I( horsepower ^2) ,data=data ,
+                    subset =index))
+set.seed (1)
+boot(Auto ,boot.fn ,1000)
+
+
+##################################################################################################
+
+# Practice Excercises
+
+# Problem_8
+
+set.seed (1)
+y=rnorm (100); x=rnorm (100); y = x-2*x^2+ rnorm (100)
+df = data.frame(x,y)
+
+# In this data set, what is n and what is p? 
+# Write out the model used to generate the data in equation form.
+
+# n = Number of observation is 100. p = number of predictors 1.
+# Equation y = beta0 + beta1 * x + beta2* x^2 + error; we have used beta0 = 0, beta1 = 1; beta2 = -2
+
+# Create a scatterplot of X against Y . Comment on what you find.
+
+plot(x, y)
+
+# Non-linear relationship (Looks like quadratic), little heteroskedasticity may be there
+
+# Set a random seed, and then compute the LOOCV errors that
+# result from fitting the following four models using least squares
+
+# 1. Y=β0+β1X+ε
+
+set.seed[1]
+library(boot) # To load boot library for using cv.glm()
+glm.fit=glm(y~x ,data=df); 
+cv.err =cv.glm(df ,glm.fit); 
+cv.err$delta[1] 
+
+# Result_Cross validation estimate of test error is 5.890979
+
+# 2. Y=β0+β1X+β2X2+ε; 3. Y=β0+β1X+β2X2+β3X3+ε; and 4. Y=β0+β1X+β2X2+β3X3+β4X4+εY=β0+β1X+β2X2+β3X3+β4X4+ε 
+
+# To repeat this procedure for increasingly complex polynomial fits (up to order 4)
+cv.err=rep(0,4)
+for(i in 1:4){
+  glm.fit=glm(y∼poly(x,i) ,data=df)
+  cv.err[i] = cv.glm(df, glm.fit)$delta[1]
 }
 cv.err
 
+# Output is 5.890979 1.086596 1.102585 1.114772
+
+# Interpretation: Quadratic models provides sharp decrease in test MSe as comare to linear model
+# There is little to no evidence of further reduce in test MSE by increasing model complexity
+
+
+# Repeat (c) using another random seed, and report your results.
+# Are your results the same as what you got in (c)? Why?
+
+set.seed[100]
+cv.err=rep(0,4)
+for(i in 1:4){
+  glm.fit=glm(y∼poly(x,i) ,data=df)
+  cv.err[i] = cv.glm(df, glm.fit)$delta[1]
+}
+cv.err
+
+# Output 5.890979 1.086596 1.102585 1.114772 
+# Exactly same result as LOOCV evaluates nn folds of a single observation.
+
+# Which of the models in (c) had the smallest LOOCV error ? 
+# Is this what you expected ? Explain your answer.
+
+# smallest LOOCV error is for cubic model.
+# We expected lowest LOOCV error for quadratic model.
 
 
 
+# Comment on the statistical significance of the coefficient estimates
+# that results from fitting each of the models in (c) using least squares. 
+# Do these results agree with the conclusions drawn based on the cross-validation results?
 
-# K-fold CV
+summary(lm(y~x, data=df)); # Coeff of x not significant, even model is not valid [f-test]
+summary(lm(y~poly(x,2), data=df)); # Model valid, all coeff significant, R2 = 0.8128, adj R2 = 0.8089 good fit
+summary(lm(y~poly(x,3), data=df)); # Model valid, all coeff except x^3 significant, R2 = 0.813, adj R2 = 0.8071 (little decrease, shows no sig improvement)
+summary(lm(y~poly(x,4), data=df));# Model valid, coeff up to x^2 significant, R2 = 0.8134, adj R2 = 0.8055 (little decrease, shows no sig improvement)
+
+#######################
+
+# Problem_9
+
+library(MASS); data1 = Boston; dim(data1); length(data1$medv)
+
+# Based on this data set, provide an estimate for the population mean of medv. Call this estimate ˆμ.
+
+mu_hat = mean(data1$medv) # estimate of population mean is mu_hat =  22.53281
+
+# Provide an estimate of the standard error of ˆμ. Interpret this result.
+mu_se = sd(data1$medv)/sqrt(length(data1$medv))
+# estimate of SE is sample se, i.e. mu_se: 0.4088611
+
+# Now estimate the standard error of ˆμ using the bootstrap. 
+# How does this compare to your answer from (b)?
+
+boot.fn=function (data ,index)
+  return (sd(data1$medv)/sqrt(length(data1$medv)))
+boot.fn(data1 ,1:length(data1$medv)
 
 
+set.seed[1]
+boot.fn(data1 ,sample (506 ,506 , replace =T)) # Output is 0.4088611
 
+boot(data1 ,boot.fn ,1000)
 
-# Bootstrap
+# ORDINARY NONPARAMETRIC BOOTSTRAP
+# 
+# 
+# Call:
+#   boot(data = data1, statistic = boot.fn, R = 1000)
+# 
+# 
+# Bootstrap Statistics :
+#   original  bias    std. error
+# t1* 0.4088611       0           0
+
+# Results are same
+
+# Based on your bootstrap estimate from (c), provide a 95% confidence interval for the mean of medv.
+# Compare it to the results obtained using t.test(Boston$medv).
+
+# 95% confidence interval fr=or bootstrap estimate
+
+CI_mu_se = c(boot(data1 ,boot.fn ,1000)$t0 - 2*0, boot(data1 ,boot.fn ,1000)$t0 - 2*0)
+# Output is 0.4088611 0.4088611
+
+# 95% confidence interval for the mean of medv
