@@ -1,4 +1,7 @@
-## Contents
+
+
+# Contents ----------------------------------------------------------------
+
 ## Numbers with Exponents
 ## In built functions in R
 ## Rounding a number in R
@@ -7,9 +10,12 @@
 ## simple arithmatics in R
 ## Atomic data types in R
 
+# Note:
 # The hashtag is used to add comments
 # More than one expressions can be placed on a single line separated by semi-colons, for example
 5; 7; 2-3
+
+                            *************************************
 
 # Numbers with Exponents
 For very big numbers or very small numbers R uses the following scheme:
@@ -28,7 +34,8 @@ z+t
 z*t
 z/t
 
-## Inbuilt mathematical functions in R
+## Inbuilt mathematical functions in R -----------------------------------------------------
+
 pi; exp(1)
 log(x); log(10); log(exp(1)) # log to base e of x
 log10(x); log10(100) # log to base 10 of x
@@ -55,8 +62,9 @@ abs(x) # the absolute value of x, ignoring the minus sign if there is one
 sin(pi/2); cos(pi/2)
 runif(5); runif(-3)
 sqrt(16); sqrt(-9); sqrt(-9+0i)
-factorial(5); factorial(-2)
+factorial(5); factorial(-2); factorial(0)
 gamma(3); gamma(0.5); gamma(1.4); gamma(0); gamma(-2)
+log(2); log(10); log10(10); log(0), log(Inf); log(-Inf)
 
 # Modulo and Integer Quotients
 
@@ -91,7 +99,8 @@ rounded(5.7)
 rounded(2.3)
 rounded(-1.2)
 
-# Infinite values in R
+# Infinite values in R -----------------------------------------------------
+
 # Plus infinity, represented in R by Inf and minus infinity is represented as -Inf
 30/0
 -10/0
@@ -109,13 +118,19 @@ Inf+Inf
 (1/2)^Inf
 0.3^Inf
 
+
+# NA's, NAN's and NULL in R -----------------------------------------------------
+
+
 # Quantities that are not numbers (undefined mathematical operators) are represented by NaN 
 #('not a number') in R
-
+# E.g.
 0/0; Inf/Inf; Inf-Inf # indeterminate form of number 
 
 # Missing values (and indeterminate form) in R are represented by NA ('not available')
 
+# NULL as the empty set from mathematics. NULL is special since it has no
+# class (its class is NULL) and has length 0 so it does not take up any space in a vector.
 
 # is.nan() is used to test for NaN's
 # is.na() is used to test, if objects are NA's
@@ -127,8 +142,35 @@ Inf+Inf
 
 # Examples on NA and NaN values
 
+# NA's and NAN's in R
 
+x = c(1, 2, 4.5, NA, NA)
 
+is.na(x)
+is.nan(x)
+
+x = c(1, 2, 4.5, NA, 4/0, 0/0)
+
+is.nan(x)
+
+is.na(x) # A NAN value can also be NA but not conversely. 
+# It means is.na also returns TRUE for NaN's
+
+NA + 1
+sum(c(NA, 1, 2))
+median(c(NA, 1, 2, 3), na.rm = TRUE)
+length(c(NA, 2, 3, 4))
+3 == NA
+NA == NA
+TRUE | NA
+NaN + 1
+exp(NaN)
+
+length(c(1, 2, NULL, 4))
+sum(c(1, 2, NULL, 4))
+x <- NULL
+y <- c(x, 2)
+is.null(x); is.null(y) #The function is.null can be used to detect NULL variables
 
 # Some functions do not work with missing values in data
 x<-c(1:8,NA)
@@ -155,6 +197,7 @@ vmv<-c(1:6,NA,NA,9:12)
 ifelse(is.na(vmv),0,vmv)
 vmv
 
+
 # More Example
 vector = c(1:3, NA, 4, NA, 4:1)
 vector
@@ -171,11 +214,18 @@ is.infinite(10)
 is.infinite(Inf)
 
 
-# Variable assignment
+# Variable assignment in R -----------------------------------------------------
+
 # Assign the value 42 to x
 x <- 42; x = 42
-# To compare
-x < -42; x > -42; x = 20; x <= 20; x >=20 # It reassigns value 20 to x
+# Logical Operators
+x < -42; x > -42; 
+x = 20; # It reassigns value 20 to x
+x <= 20; x >=20; x!=20; x!=15; x == 20 
+
+x <- c(T, T, F, F); y <- c(T, F, T, F); z <- c(1, 0, 1, 0)
+x&y; x|y
+x&z; x|z # z is coerced to logical vector automatically
 
 x <- 1:20; x # To create a sequence 1 2 3 .... 20
 x = 5:1; x; x = 1:-2; x; x = -3:1; x
@@ -188,7 +238,7 @@ x # Simple way to print x/ To auto print the value of x
 ## Some simple airthmatic operations
 # + - */%% ^ arithmetic
 # > >= < <= == != relational
-# ! &  logical
+# ! & | logical
 # ~ model formulae
 # <- -> assignment
 # $ list indexing (the 'element name' operator)
@@ -215,7 +265,7 @@ x # Simple way to print x/ To auto print the value of x
 2*1:4
 n<-5
 1:n-1
-n-1:1 # WHY ??? can't get it
+(n-1):1 
 6:1
 6+12
 
@@ -234,7 +284,15 @@ my_fruit = my_apples + my_oranges
 # Create the variable my_fruit
 my_fruit
 
-# Basic data types in R
+# Basic data types in R -----------------------------------------------------
+
+# numeric Numeric data (approximations of the real numbers, ℝ)
+# integer Integer data (whole numbers, ℤ)
+# factor Categorical data (simple classifications, like gender)
+# ordered Ordinal data (ordered classifications, like educational level)
+# character Character data (strings)
+# raw Binary data
+
 # Character, Numeric sometimes called double, Integer, Complex, Logical
 
 my_character <- "forty-two" # The quotation marks indicate that the variable is of type character
@@ -262,13 +320,46 @@ datatype5
 
 class(42.3L); class(42.3); class(23); class(23L); class(0); class(0L) # See warning msg in first example
 class(pi); class(piL) # PiL is not any object in R
-class(NA); class(NaN); class(Inf) # WHY ????  Special number: Inf, nan
+class(0/0); class(5/0); class(Inf)   # Special number: Inf, nan
 
 
-? mean
-x <- c(0:10, 50)
-x
-xm <- mean(x, trim = 0)
-xm
-105/12
-c(xm, mean(x, trim = 0.10))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
