@@ -1,0 +1,89 @@
+### DATA FRAMES IN R
+
+
+## Contents
+## Why data frames
+## Constructing a data frame in R
+## Subsetting of a data frame in R
+
+
+## Why data frames
+# Data frames - similar to tables (databases), dataset (SAS/SPSS) etc.
+# Consists of columns of different types; More general than a matrix
+# Unlike matrices, data frames can store different classes of objects in each column (just like lists); matrices must have every element be the same class
+# Columns – Variables; Rows – Observations
+# Convenient to hold all the data required for a data analysis
+# They are represented as a special type of list where every element of the list has to have the same length
+# Data frames also have a special attribute called row.names
+
+
+# DATA Frame creation in R ------------------------------------------------
+
+# To create a data frame by using data frame() function
+length <- c(180,175,190)
+weight <- c(75,82,88)
+name <- c("Anil","Ankit","Sunil")
+data <- data.frame(name,length,weight)
+
+# Data frames can also created by calling read.table() or read.csv()
+# Data frames can be converted to a matrix by calling data.matrix()
+
+# Extract data from a data frame
+my.names <- data$name
+length1 <- data$length[1]
+
+## data frame Subsetting
+
+
+
+setwd("D:/Learning/Learn R/R_programming data and codes/therbook")
+
+worms = read.table("worms.txt", header=T); class(worms)
+names(worms); head(worms); tail(worms); worms; fix(worms)
+dim(worms); nrow(worms); length(worms); ncol(worms)
+summary(worms) # Because worms is a dataframe, the characters have all been coerced to factors
+
+
+#   means of the numeric variables for each vegetation type
+by(worms,Vegetation,mean)
+# Here logical variable Damp has been coerced to numeric (T=1, F=0) and then averaged.
+
+worms[3,5]; # Soil.pH (the variable in column 5) in row 3
+worms[14:19,7] # a range of values (say the 14th to 19th rows) from worm density (col 7)
+worms[1:5,2:3] # Area and Slope (columns 2 and 3) from rows 1 to 5
+worms[,c(1,5)]
+worms[-(6:15),] # removing rows from 6 to 15
+
+sample(1:5) # Generate a random sample from the sequence 1:5 without replacement (shuffling)
+sample (1:5, 3) # Generate a random sample of 3 number from the sequence 1:5 without replacement
+sample(1:5, replace = T) # Generate a random sample from the sequence 1:5  with replacement
+
+worms[sample(1:20,8),] # A unique 8 of the 20 rows at random
+worms[sample(1:nrow(worms),8),] # Alternate way
+
+# Using Logical Conditions to Select Rows from the Dataframe
+worms[Damp == T,]
+worms[!Damp==F,] # Alternate way
+worms[-which(Damp==F),] # Alternate way
+worms[!(Vegetation=="Grassland"),] # rows that are not grasslands
+worms[Worm.density > median(Worm.density) & Soil.pH < 5.2,]
+
+
+# To sort the dataframe on the basis of values in one of the columns (say, Slope)
+worms[order(Slope),] # to apply to all the columns, the column subscript (after the comma) is blank
+
+worms[rev(order(Slope)),] # Reverse order
+
+# sorting operations might involve two or more variables
+# R will sort on the basis of the left-hand variable, with ties being broken by the second
+# variable, and so on
+worms[order(Vegetation,Worm.density),] # rows of the database on worm density  within each vegetation type
+
+worms[,sapply(worms,is.numeric)] # columns of worms which are numeric
+worms[,sapply(worms,is.factor)] # columns of worms which are factors
+# Because worms is a dataframe, the characters have all been coerced to factors
+# worms[,sapply(worms,is.character)] produces the answer NULL.
+
+# To omit missing values
+data = read.table("worms.missing.txt", header = T); summary(data)
+is.na(data); na.omit(data)
