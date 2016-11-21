@@ -1,0 +1,373 @@
+# Apply Family Functions in R
+
+
+#  When do we use apply functions? ----------------------------------------
+
+# When we have some structured blob of data that we wish to perform operations on. 
+# Here structured means in some form of matrix. 
+# The operations may be informational, or perhaps transforming, 
+# subsetting, whatever to the data.
+# As a commenter pointed out, if you are using a data frame 
+# the data types must all be the same otherwise they will be subjected to type conversion. 
+# This may or may not be what you want, if the data frame has string/character data as well as numeric data, 
+# the numeric data will be converted to strings/characters and numerical operations will probably not give what you expected. 
+# As in example below, ‘1’ numeric is coerced to character
+# class(c(1, "a"))
+# [1] "character"
+
+# loop functions = convenient ways of implementing the Split-Apply-Combine strategy for data analysis
+
+# References:
+# Awesome discussions:  http://stackoverflow.com/questions/3505701/r-grouping-functions-sapply-vs-lapply-vs-apply-vs-tapply-vs-by-vs-aggrega
+
+
+# Contents ----------------------------------------------------------------
+The split() Function
+The apply() Function
+The lapply() Function
+The sapply() Function
+The vapply() Function
+The tapply() Function
+The mapply() Function
+The aggregate() Function
+The with() Function
+
+
+# The split() function------------------------------------------------------
+
+# It takes a vector/objects and splits it into group b a factor or list of factors
+
+# Example_1
+# define a binary vector of 1 and 0
+x<-rep(c(1,0),c(5,5)); x
+y<-c(12,34,25,12,20,56,67,45,60,78)
+split(y,x) # split y as per x
+class(split(y,x)) # list
+
+# Example_2
+# define an unbalanced data
+# a vector of 4 Zoology and 6 Botany students
+x<-rep(c("Zoology","Botany"),c(4,6)); x
+split(y, x) # Split vector y for two categories of x
+split(x, y) # Split vector x as per y; not really meaningful
+
+# define a vector of 3 categories
+income<-c(rep(c("low","medium","high"),c(4,3,3)))
+split(y, income) # In alphabetical order
+
+# split(x, f, drop = FALSE)
+# – x = vector/list/data frame
+# – f = factor/list of factors
+# – drop = whether empty factor levels should be dropped
+# • interactions(gl(2, 5), gl(5, 2)) = 1.1, 1.2, . . . 2.5
+# – gl(n, m) = group level function
+# * n = number of levels
+# * m = number of repetitions
+# – split function can do this by passing in list(f1, f2) in argument
+# * split(data, list(gl(2, 5), gl(5, 2))) = splits the data into 1.1, 1.2, . . . 2.5 levels
+
+# The apply() function ----------------------------------------------------
+
+# • evaluate a function (often anonymous) over the margins of an array
+# • often used to apply a function to the row/columns of a matrix
+# • can be used to average array of matrices (general arrays)
+# • apply(x, margin = 2, FUN, ...)
+# – x = array
+# – MARGIN = 2 (column), 1 (row)
+# – FUN = function
+# – ... = other arguments that need to be passed to other functions
+# • examples
+
+# – apply(x, 1, sum) or apply(x, 1, mean) = find row sums/means
+# – apply(x, 2, sum) or apply(x, 2, mean) = find column sums/means
+# – apply(x, 1, quantile, props = c(0.25, 0.75)) = find 25% 75% percentile of each row
+# – a <- array(rnorm(2*2*10), c(2, 2, 10)) = create 10 2x2 matrix
+# – apply(a, c(1, 2), mean) = returns the means of 10
+
+# When you want to apply a function to the rows or columns of a matrix (and higher-dimensional analogues); 
+# not generally advisable for data frames as it will coerce to a matrix first.
+
+# Example_1 Matrix
+m <- matrix(data=cbind(rnorm(30, 0), rnorm(30, 2), 
+                       rnorm(30, 5)), nrow=30, ncol=3)
+
+# To find column-wise mean of matrix m
+apply(m, 2, mean) # '2' denotes column
+
+# To find column-wise mean of matrix m
+apply(m, 1, mean) # '1' denotes row of matrix m
+
+# To check how many negative numbers each column has
+apply(m, 2, function(x) length(x[x<0]))
+# The actual function is using subsetting to extract all the elements in x that are less than 0, 
+# and then counting how many are left are using length. 
+
+
+# The function takes one argument, which I have arbitrarily called x. In this case x will be a single column of the matrix. 
+# Is it a 1 column matrix or a just a vector?
+apply(m, 2, function(x) is.matrix(x))
+
+# Similarly
+apply(m, 2, function(x) is.vector(x))
+
+# To find column-wise mean of positive values only
+apply(m, 2, function(x) mean(x[x>0]))
+
+# Example_2 Array
+# 3 dimensional array
+M <- array( seq(32), dim = c(4,4,2))
+
+# Apply sum across each M[*, , ] - i.e Sum across 2nd and 3rd dimension
+apply(M, 1, sum)
+# Result is one-dimensional
+[1] 120 128 136 144
+
+# Apply sum across each M[*, *, ] - i.e Sum across 3rd dimension
+apply(M, c(1,2), sum)
+# Result is two-dimensional
+     [,1] [,2] [,3] [,4]
+[1,]   18   26   34   42
+[2,]   20   28   36   44
+[3,]   22   30   38   46
+[4,]   24   32   40   48
+
+
+
+# The lapply() Function ---------------------------------------------------
+
+# loops over a list and evaluate a function on each element and always returns a list
+# – Note: since input must be a list, it is possible that conversion may be needed
+# • lapply(x, FUN, ...) = takes list/vector as input, applies a function to each element of the list,
+# returns a list of the same length
+# – x = list (if not list, will be coerced into list through “as.list”, if not possible —> error)
+# * data.frame are treated as collections of lists and can be used here
+# – FUN = function (without parentheses)
+#   * anonymous functions are acceptable here as well - (i.e function(x) x[,1])
+# – ... = other/additional arguments to be passed for FUN (i.e. min, max for runif())
+# • example
+# – lapply(data.frame, class) = the data.frame is a list of vectors, the class value for each vector
+# is returned in a list (name of function, class, is without parentheses)
+# – lapply(values, function(elem), elem[2]) = example of an anonymous function
+
+# When you want to apply a function to each element of a list in turn 
+# and get a list back.
+
+# Example_1
+x <- list(a = 1, b = 1:3, c = 10:100) 
+lapply(x, FUN = length)
+lapply(x, FUN = sum)
+
+# Example_2
+x<-rep(c(1,0),c(5,5)); x
+y<-c(12,34,25,12,20,56,67,45,60,78)
+split(y,x) # split y as per different categories of x
+class(split(y,x)) # list
+
+#  lapply(list, function) is used to apply a function to each element of a list 
+# in turn and get a list back. 
+
+#get mean for each split
+lapply(split(y,x),mean) # returns a list
+class(lapply(split(y,x),mean)) 
+
+# The sapply () Function --------------------------------------------------
+
+# performs same function as lapply() except it simplifies the result
+# – if result is of length 1 in every element, sapply returns vector
+# – if result is vectors of the same length (>1) for each element, sapply returns matrix
+# – if not possible to simplify, sapply returns a list (same as lapply())
+
+# When you want to apply a function to each element of a list in turn, 
+# but you want a vector back, rather than a list.
+
+# Example_1
+x <- list(a = 1, b = 1:3, c = 10:100)
+lapply(x, FUN=length) # Returns a list
+sapply(x, FUN = length) # Better way, as it returns a vector
+unlist(lapply(x, FUN = length)) # Alternate way
+sapply(x, FUN = sum)
+unlist(lapply(x, FUN = sum)) # ALternate way
+
+#Example_2
+x<-rep(c(1,0),c(5,5)); x
+y<-c(12,34,25,12,20,56,67,45,60,78)
+split(y,x) # split y as per different categories of x
+
+#get mean for each split
+lapply(split(y,x),mean) # returns a list
+
+## A better output
+sapply(split(y,x),mean) # returns a vector
+sapply(split(y,x),sd)
+sapply(split(y,x),var)
+sapply(split(y,x),summary)
+
+## define a new function for cv
+cv<-function(x) (sd(x)/mean(x))*100
+sapply(split(y,x),cv)
+
+# Example_3
+# define an unbalanced data
+# a vector of 4 Zoology and 6 Botany students
+x<-rep(c("Zoology","Botany"),c(4,6))
+y<-c(12,34,25,12,20,56,67,45,60,78)
+sapply(split(y,x),summary) # summary of vector y for two categories of x
+
+# define a vector of 3 categories
+income<-c(rep(c("low","medium","high"),c(4,3,3)))
+M2<-sapply(split(y,income),summary)
+M2 # Output in alphabetical order
+
+# The order should be low medium and high
+M2[,c("low","medium","high")]
+M2 # Output in given order
+
+# In more advanced uses of sapply it will attempt to coerce 
+# the result to a multi-dimensional array, if appropriate. 
+# For example, if our function returns vectors of the same length, 
+# sapply will use them as columns of a matrix:
+
+# rnorm(3, x) generates '3' random normal variables with mean x and sd 1(default).  
+
+sapply(1:5,function(x) rnorm(3,x))
+# If our function returns a 2 dimensional matrix, sapply will do essentially the same thing, 
+# treating each returned matrix as a single long vector.
+  
+sapply(1:5,function(x) matrix(x,2,2))
+# Unless we specify simplify = "array", 
+# in which case it will use the individual matrices to build a multi-dimensional array.
+  
+sapply(1:5,function(x) matrix(x,2,2), simplify = "array")
+# Each of these behaviors is of course contingent on our function returning vectors or matrices 
+# of the same length or dimension.
+
+
+# The vapply() function ---------------------------------------------------
+
+# safer version of sapply in that it allows to you specify the format for the result
+# – vapply(flags, class, character(1)) = returns the class of values in the flags variable in the
+# form of character of length 1 (1 value)
+
+
+# The tapply() function ---------------------------------------------------
+
+# • split data into groups, and apply the function to data within each subgroup
+# • tapply(data, INDEX, FUN, ..., simplify = FALSE) = apply a function over subsets of a vector
+# – data = vector
+# – INDEX = factor/list of factors
+# – FUN = function
+# – ... = arguments to be passed to function
+# – simplify = whether to simplify the result
+# • example
+
+# – x <- c(rnorm(10), runif(10), rnorm(10, 1))
+# – f <- gl(3, 10); tapply(x, f, mean) = returns the mean of each group (f level) of x data
+
+
+# To produce a table from the values in the vector, based on one or more grouping variables (often the grouping is by factor levels).
+
+# Example "tapply function'
+
+# For a sample of 30 tax accountants from Australia,their individual state of origin is given in the vector 'states'
+
+states <- c("tas", "sa", "qld", "nsw", "nsw", "nt", "wa", "wa",
+            "qld", "vic", "nsw", "vic", "qld", "qld", "sa", "tas",
+            "sa", "nt", "wa", "vic", "qld", "nsw", "nsw", "wa",
+            "sa", "act", "nsw", "vic", "vic", "act")
+length(states); str(states)
+
+statef = factor(states); statef # To create a similar factor
+levels(statef) # To get the level of the factor; 8 levels as there are 8 states in AUstralia
+# For the same sample of 30 tax accountants, their incomes in another vector 'incomes' (in suitably large units of money)
+incomes <- c(60, 49, 40, 61, 64, 60, 59, 54, 62, 69, 70, 42, 56,
+             61, 61, 61, 58, 51, 48, 65, 49, 49, 41, 48, 52, 46,
+             59, 46, 58, 43)
+length(incomes)
+
+# To calculate the sample mean income for each state using 'tapply' function
+incmeans <- tapply(incomes, statef, mean); incmeans
+incvar <- tapply(incomes,states, var) ; incvar
+
+# The function tapply() is used to apply a function, here mean() or var(), to each group of components
+# of the first argument, here incomes, defined by the levels of the second component, here statef as if they were separate vector structures
+
+# To do the same for SE, we write a function for SE using var() function (for sample variance)
+stderr <- function(x) sqrt(var(x)/length(x))
+incster <- tapply(incomes, statef, stderr); incster
+
+More Examples:
+data<-read.table("c:\\temp\\daphnia.txt",header=T) # To reads a file & create a data frame named 'data' from it
+
+attach(data) ## THE R BOOK PAGE 25 data file ???
+names(data) # The response variable is Growth.rate and the other three variables are factors
+
+tapply(Growth.rate,Detergent,mean) # To produce a table with four entries, one for each level of the factor called Detergent
+tapply(Growth.rate,list(Water,Daphnia),median) # To calculate the median growth rate for water type and daphnia clone
+# The first variable in the list creates the rows of the table and the second the columns
+
+# The mapply() function ---------------------------------------------------
+
+# • multivariate apply, applies a function in parallel over a set of arguments
+# • mapply(FUN, ..., MoreArgs = NULL, SIMPLIFY = TRUE)
+# – FUN = function
+# – ... = arguments to apply over
+# – MoreArgs = list of other arguments to FUN
+# – SIMPLIFY = whether the result should be simplified
+
+# mapply(rep, 1:4, 4:1)
+ 
+
+# The aggregate() function ------------------------------------------------
+
+# aggregate computes summary statistics of data subsets (similar to multiple tapply at the same time)
+# • aggregate(list(name = dataToCompute), list(name = factorVar1,name = factorVar2),
+#             function, na.rm = TRUE)
+# – dataToCompute = this is what the function will be applied on
+# – factorVar1, factorVar1 = factor variables to split the data by
+# – Note: order matters here in terms of how to break down the data
+# – function = what is applied to the subsets of data, can be sum/mean/median/etc
+# – na.rm = TRUE ! removes NA values
+
+# The with() Function -----------------------------------------------------
+sugarPatients <- read.table("D:/Learning/Learn R/R presentations/DataAnalysisWithR/sugarPatients.txt", header=TRUE, quote="\"")
+View(sugarPatients)
+
+# Frequency tables - Different ways of creating it:
+table(sugarPatients$Sex)
+attach(sugarPatients); table(Sex) # Alternate way
+xtabs(~Sex, sugarPatients)
+
+xtabs(~Sugar,sugarPatients) # using xtab function
+
+# cross tabulation making use of function with as:
+with(sugarPatients,table(Sugar,Sex))
+attach(sugarPatients); table(Sugar,Sex) # Alternate way
+xtabs(~Sugar+Sex,sugarPatients) # using xtab function
+
+
+# With Sugar and Age
+with(sugarPatients,table(Sugar,Age))
+# With all the three
+with(sugarPatients,table(Sugar,Age,Sex))
+attach(sugarPatients); table(Sugar, Age, Sex)
+attach(sugarPatients); xtabs(~Sugar+Age+Sex)
+
+# Get proportions in rows
+with(sugarPatients,prop.table(table(Sugar,Age),1)) # 1 stands for rows
+# Get proportions in columnsl
+with(sugarPatients,prop.table(table(Sugar,Age),2)) # 2 stands for columns
+
+# The with function evaluates an R expression in an environment constructed from data
+with(OrchardSprays,boxplot(decrease~treatment))
+library(MASS); str(bacteria) # In the library MASS, there is a data frame 'bacteria'
+with(bacteria,tapply((y=="n"),trt,sum)) # To calculate the number of 'no' (not infected) cases in the bacteria
+
+str(mammals) # To see the structure of dataframe 'mammals
+with(mammals,plot(body,brain,log="xy")) # To plot brain weight against body weight for mammals on log-log axes
+
+
+reg.data<-read.table("c:\\temp\\regression.txt",header=T), reg.data
+with (reg.data, {
+  model<-lm(growth~tannin)
+  summary(model) } )
+summary(lm(growth~tannin,data=reg.data))
