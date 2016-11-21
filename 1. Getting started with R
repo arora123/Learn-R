@@ -1,10 +1,14 @@
-## Contents
+# Getting started with R 
+
+
+# CONTENTS ----------------------------------------------------------------
+
+## Packages in R
+## Working directory in R
 ## Get help in in R
 ## Demonstration and worked examples in R
-## Libraries in R
-## Data Editor
-## To unzip a file/download a zip file in R and To load an Excel file in R
-## To check and set current working directory
+## To import, edit, view, export data  in/from R
+## Available data sets in R
 ## To Change the Look of the R Screen
 ## Disappearing Graphics in R
 ## Good Housekeeping
@@ -13,25 +17,108 @@
 ## To save file (encoding option)
 ## To exit current R session
 ## To see all the objects saved and to delete some/all of them
+## To upgrade to a latest version of R
+## Common errors in R
+# https://github.com/noamross/zero-dependency-problems/blob/master/misc/stack-overflow-common-r-errors.md
+# Options_number of digits display in R
+# http://www.burns-stat.com/the-options-mechanism-in-r/
 
 
-## TO GET HELP IN R
+# *********************************************************************************************
 
-# To get help on the function, if function name is known
-?is.null      # To get help on the function is.null, for example
-help(is.null)
 
-is.null(x) returns TRUE if its argument is NULL and FALSE otherwise.
-as.null(x) ignores its argument and returns the value NULL. 
+# Packages in R -----------------------------------------------------------
 
-# To get help on a subject, if precise function name is not knnown
+# Detailed instructions are given in the presentation "1 Installing & Getting started with R.ppt"
+
+# To use any library/package in R, you need to first install it (once) 
+# and then load it (for every session).
+# For every R session, you need to load the required library again
+
+# To see all packages installed
+library() 
+#To see packages currently loaded
+search() 
+#To install a package ‘caret’
+install.packages(“caret”, dependencies=TRUE)
+#To load a package ‘caret’
+library(caret) # Note: there is no ""
+#To  discover the contents of library package ‘caret’
+library(help=caret)
+
+# install package from zip file
+install.packages("D:/Downloads/accrued_1.4.1.zip", repos = NULL)
+
+# To view the full list of the contents of a library
+objects(grep("spatial",search()))  
+
+# To unload a package without having to restart R 
+detach("package:spatial", unload=TRUE)
+detach_package(spatial) # Alternate way
+detach_package("spatial", TRUE) # Alternate way
+
+unloadNamespace("sqldf") # detaches the namespace prior to unloading it
+
+
+# Working Directory in R --------------------------------------------------
+
+# To check the current working directory
+getwd()
+# To set a new working directory
+setwd("D:\\Learning\\Learn R\\R_programming data and codes")
+Note: use '\\' or '/' in the path of directory
+# The shortcut (to get/change the current working directory) 
+"ctr+shift+h“ 
+
+
+# To get help in R --------------------------------------------------------
+
+# There are various options to get help in R, some of these are:
+
+# Click on the 'Help' menu
+
+# To invoke a built-in help browser 
+help.start()
+
+# To get help on some specific command
+?keyword
+help(keyword)
+# For example
+?is.null      # To get help on the function 'is.null'
+help(is.null); ?is.null() # ALternate ways
+
+# To get help on a subject, if precise command is not knnown
 help.search("data input") # To get help on a subject 'data input', for example
+
+# To check what package something is in, using 'find' function
+find("lowess"); find("pairs") 
+
+# If you are not sure of the command 
+apropos("mean")
+apropos("wd")
+# It returns a character vector giving the names of all objects 
+# in the search list that match our (potentially partial) enquiry
+
+
+## To find some function from all packages (not necessarily installed)
+# If you want to look through packages that you have not necessarily installed, 
+# you could try using the findFn function in the sos package. 
+
+# This function searches the help pages of packages covered by the RSiteSearch archives 
+# (which includes all packages on CRAN)
+
+library(sos); findFn("white.test")
+
 
 # First source to get online help is http://cran.r-project.org/
 
-## Worked Examples of Functions
 
-example(lm) # To see a worked example (lm represents linear models)
+# Sample Problems in R ----------------------------------------------------
+
+## Worked Examples of Functions 
+
+# To see a worked example (lm represents linear models)
+example(lm) 
 
 ## Demonstrations of R Functions
 
@@ -41,28 +128,29 @@ demo(persp)
 demo(Hershey)
 demo(plotmath)
 
-# Libraries in R
-library(spatial) # To load the library spatial 
 
-# Contents of Libraries
-library(help=spatial) # To use the help function to discover the contents of library package 'spatial'
+# To import data in R -----------------------------------------------------
 
-objects(grep("spatial",search()))  # To view the full list of the contents of a library
 
-# To install Packages and Libraries
-install.packages("akima")
-install.packages("chron")
+# Detailed instructions are given in the presentation "1 Installing & Getting started with R.ppt"
+# Make sure to set your working directory
 
-# Data Editor in R
-# It can be accessed from the menu bar by selecting Edit/Data editor (in command line interface)
-fix(data.frame.name) # Alternate way to edit data in the data frame/matrix
 
-# To import data from Excel (saved in a tab-delimited text file), use the function called read.table
+#To import Text data file in R
+myTEXTdata=read.table("mydata.txt“, header = TRUE)
+  
+#To import CSV data file in R
+
+myCSVdata <- read.table("c:/mydata.csv", header=TRUE, sep=",", row.names="id")
+
+# Note: the '/' instead of '\' on Windows systems
+myCSVdata = read.csv("mydata.csv")
+
 
 ## NOTE: Read.csv is identical to read.table with the only difference 
 # that in Read.csv() the default separator is comma while in read.table() it's space.
 
-# To unzip a file (saved in current working directory and read)
+#To unzip a file (saved in current working directory and read)
 src.file <- unz("diet_data.zip", "diet_data/Andy.csv")
 x = read.csv("diet_data/Andy.csv")
 x
@@ -73,9 +161,6 @@ unzip("diet_data.zip", exdir = "diet_data")
 andy <- read.csv("diet_data/Andy.csv")
 
 
-data2 = read.table("hw1_data R programming.csv", header = TRUE, sep = ",",fileEncoding='UCS-2LE')
-# read.table is not working
-
 # to install perl for read.xls
 installXLSXsupport(perl = 'C:\\strawberry\\perl\\bin\\perl.exe') 
 
@@ -83,16 +168,52 @@ installXLSXsupport(perl = 'C:\\strawberry\\perl\\bin\\perl.exe')
 # FIrstly install package "xlsx" and perl then load it with library() and finally read it
 library(xlsx)
 help(read.table)
-data <- read.xls("hw1_data R programming.xlsx")
+data <- read.xls("hw1_data R programming.xlsx") # To load excel file from the working directory
+data <- read.xls("abc.xlsx", sheetName = "sheet1", header = T) # To specify sheet number & include headers
 data1 = read.csv("hw1_data R programming.csv")
 
-# To check the current working directory
-getwd()
-# To set a new working directory. Note: use '\\' or '/' in the path of directory
-setwd("D:\\NISHA\\R Coursera\\R_programming")
-# The shortcut (to get and change the current working directory) is press - "ctr+shift+h" 
 
-search()      # To see all the packages that are currently loaded in R
+## To import data, if the name and location of the file is unknown
+
+# reading a csv file, if the name and location of the file is unknown
+mydata <- read.csv(choose.files())
+
+# reading an excel file, if the name and location of the file is unknown
+mydata <- read.xlsx(choose.files())
+
+# reading a file with a table structure (& separated by tab), if the name and location of the file is unknown
+library(xlsx); mydata <- read.table(choose.files(), sep = "\t")
+
+# reading a SPSS file, if the name and location of the file is unknown
+library(foreign); mydata <- read.spss(choose.files())
+
+## To look at available data sets in R
+data()
+
+# To load available data set
+data(mtcars) # It will load in built dataset named 'mtcars'
+mtcars # Alternate way
+
+# To get help data description
+help(mtcars)
+
+# To view data set
+View(mtcars) # Note: View is different from view
+
+# To edit data set 
+edit(mtcars) # Open data editor
+fix(mtcars) # ALternate way
+
+# For data frame/ matrix data objects they are shown in a spread sheet 
+# while list is shown in notepad
+
+# Data editor can also be accessed from the menu bar by selecting Edit/Data editor (in command line interface)
+
+
+# To export data from R, similar functions write.csv, write.table etc can be used
+# For more details, refer "1 Installing & Getting started with R" 
+# Other useful tips -------------------------------------------------------
+
 
 # To Change the Look of the R Screen
 # The Rgui Configuration Editor under Edit/GUI preferences (in command line interface)
@@ -106,19 +227,28 @@ par(ask=TRUE) # To stop multiple graphs whizzing by
 x=5 
 y=7
 
-objects() # To see variables created in the current session
-search() # To see libraries and dataframes attached
+# To see variables created in the current session
+objects() 
+# To see libraries and objects attached
+search() 
 
 # Linking to Other Computer Languages
 # Functions .Call and .External provide interfaces which allow compiled code (primarily compiled C code) to manipulate R objects.
 
 # Tidying Up (at the end of R session)
 
-rm(x, y, z) # To remove (rm) any variables names (x, y, z) created in the current session
 detach(data.frame.name) # To detach any data frame attached earlier in the session
 detach(mtcars)
 # NOTE: detach command does not make the dataframe disappear; it just means that 
 # the variables within this data frame, are no longer accessible directly by name.
+
+rm(x, y, z) # To remove (rm) any variables names (x, y, z) created in the current session
+## To see all the objects saved and to delete some/all of them
+# The ls() function allows us to look at a list of all of the objects that we have saved so far.
+# The rm() function can be used to delete any that we don’t want.
+
+x <-5; y <- x+2; z <--3
+ls(); rm(x); ls()
 
 rm(list=ls()) # To get rid of everything, including all the dataframes
 
@@ -126,9 +256,23 @@ rm(list=ls()) # To get rid of everything, including all the dataframes
 # UTF-8 is superset of all encoding options, its better to make it default option to save files 
 q() # To quit the current R session
 
-## To see all the objects saved and to delete some/all of them
-# The ls() function allows us to look at a list of all of the objects that we have saved so far.
-# The rm() function can be used to delete any that we don’t want.
-x <-5; y <- x+2; z <--3
-ls(); rm(x); ls(); rm(list=ls())
 
+
+## To check version of R
+version
+
+## To upgrade to a latest version of R
+install.packages("installr") # install 
+setInternet2(TRUE) # saves some troubles
+library(installr)
+installr::updateR() # updating R.
+# If there is any issue; Try to run R in administrator mode.
+http://windows.microsoft.com/en-us/windows7/how-do-i-run-an-application-once-with-a-full-administrator-access-token
+# Locate the program icon or a shortcut in Windows Explorer.
+# Right-click the program icon or shortcut, and then click Run as administrator.
+
+## Common errors in R
+# https://github.com/noamross/zero-dependency-problems/blob/master/misc/stack-overflow-common-r-errors.md
+
+
+save.image("D:/LearnR.RData")
