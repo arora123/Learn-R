@@ -1,0 +1,519 @@
+# Data Visualization in R Part_1 [Basic Plots]
+
+# References
+# https://www.datacamp.com/community/tutorials/15-questions-about-r-plots#gs.Nd2bja8
+# http://www.uni-kiel.de/psychologie/rexrepos/posts/diagMultivariate.html
+
+# Contents ----------------------------------------------------------------
+
+
+## Combining multiple plots in a figure
+## Saving plot in variuos formats
+## Bar Chart
+## Pie Chart
+## Histogram
+## Line Chart
+## Box & Whiskers Plot
+## Scatter Plot
+## Density Plots
+## Colors in R [http://www.sthda.com/english/wiki/colors-in-r  &   http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf]
+install.packages("RColorBrewer")
+
+
+#         ***********************************************
+
+
+# Combining multiple plots in a figure ------------------------------------
+
+# There are three basic ways to place multiple plots in a single figure 
+# [see more at: http://sphaerula.com/legacy/R/multiplePlotFigure.html
+#  & http://www.statmethods.net/advgraphs/layout.html]
+
+# par(mfrow) and par(mfcol)
+# split.screen()
+# layout()
+
+# Note: plot.new() skips a position.
+# Note: dev.off() or par(mfrow=c(1,1)) or par(mfcol=c(1,1)) reset spliting plot window
+# Note: par(bg = "turquoise") # To change background color
+
+# mfrow simply stands for "MultiFrame rowwise layout". The mfcol: mfcol stands for MultiFrame columnwise layout.
+# The mfrow parameter to the par() function sets up drawing of multiple plots by row; mfcol sets up drawing of multiple plots by column. 
+# A vector with two values must be provided that sets the number of rows and columns.
+
+# par(mfrow=c(a,b)) gives 'a' rows with 'b' plots on each row [plotted row-wise].
+# par(mfcol=c(a,b)) gives 'a' rows with 'b' plots on each row [plotted column-wise].
+
+##  Set up plotting in two rows and three columns, plotting along rows first.
+
+par( mfrow = c( 2, 3 ) )
+
+##  The first plot is located in row 1, column 1:
+
+plot( rnorm( n = 5 ), col = "green", main = "plot 1" )
+
+##  The second plot is located in row 1, column 2:
+
+plot( runif( n = 10 ), col = "blue", main = "plot 2" )
+
+##  The third plot is located in row 1, column 3:
+
+plot( rt( n = 10, df = 8 ), col = "springgreen4", main = "plot 3")
+
+##  The fourth plot is located in row 2, column 1:
+
+plot( rpois( n = 10, lambda = 2 ), col = "black", main = "plot 4")
+
+##  plot.new() skips a position.
+
+plot.new()
+
+##  The fifth plot is located in row 2, column 3:
+
+plot( rf( n = 10, df1 = 4, df2 = 8 ), col = "gray30", main = "plot 5")
+      
+
+# Try running all the above plots with par(mfcol=c(2,3)) and see the difference in the arrangement of graphs
+
+##  Split the screen into two rows and one column, defining screens 1 and 2.
+
+split.screen( figs = c( 2, 1 ) )
+
+##  Split screen 1 into one row and three columns, defining screens 3, 4, and 5.
+
+split.screen( figs = c( 1, 3 ), screen = 1 )
+
+##  Split screen 2 into one row and two columns, defining screens 6 and 7.
+
+split.screen( figs = c( 1, 2 ), screen = 2 )
+
+##  The first plot is located in screen 3:
+
+screen( 3 )
+plot( rnorm( n = 10 ), col = "red", main = "plot 1" )
+
+##  The second plot is located in screen 4:
+
+screen( 4 )
+plot( runif( n = 10 ), col = "blue", main = "plot 2" )
+
+##  The third plot is located in screen 5:
+
+screen( 5 )
+plot( rt( n = 10, df = 8 ), col = "springgreen4", main = "plot 3" )
+
+##  The fourth plot is located in screen 6:
+
+screen( 6 )
+plot( rpois( n = 10, lambda = 2 ), col = "black", main = "plot 4" )
+
+##  The fifth plot is located in screen 7:
+
+screen( 7 )
+plot( rf( n = 10, df1 = 4, df2 = 8 ), col = "gray30", main = "plot 5" )
+
+
+# Saving plot in variuos formats ------------------------------------------
+
+# Give the chart file a name.
+png(file = "Test_chart.png")
+
+# Plot the required chart. 
+plot(1:20,type = "o")
+
+# Save the file.
+dev.off() # "Test_chart.jpg" file will be saved in the working directory
+
+bmp(file = "Test_chart.bmp")
+plot(1:20,type = "o")
+dev.off()
+
+
+jpeg(file = "Test_chart.jpg")
+plot(1:20,type = "o")
+dev.off()
+
+
+pdf(file = "Test_chart.pdf")
+plot(1:20,type = "o")
+dev.off()
+
+pdf(file = "Test_chart.pdf", width=7, height=5) # Define dimensions
+plot(1:20,type = "o")
+dev.off()
+
+# Create multiple pdfs of figures, with one pdf per figure
+pdf(width=7, height=5, onefile=FALSE)
+x <- rnorm(100)
+hist(x, main="Histogram of X")
+plot(x, main="Scatterplot of X")
+dev.off() # Stop graphics device
+
+# Bar Plot ----------------------------------------------------------------
+
+## A) Simple Bar Plot
+
+#Example_1
+x1 = c(70, 52, 85, 97, 40)
+barplot(x1)
+
+names(x1)<-c("Monika","Balbir","Yashpal","Priyanka","Kritika")
+barplot(x1)
+barplot(x1, main = "barplot1", 
+        xlab = "Student's Name", ylab = "Marks")
+
+barplot(x1, horiz=TRUE)
+
+barplot(x1, space=3)
+barplot(x1, space=3, 
+        col=c("blue", "red", "green", "dark green", "black"))
+
+
+# Also try
+barplot(c(10, 20, 15, 12, 30))
+
+
+#Example_2
+MPCE = c(400, 5000, 350, 456)
+name = c("x", "f", "d", "g")
+barplot(MPCE, space=3) # the amount of space (as a fraction of the average bar width) left before each bar is defined here
+barplot(MPCE, space=3, name = name) # names are given
+barplot(MPCE, name=name,space=3, col=c("blue", "red", "green", "dark green")) # colors are added
+
+#Example_3
+data = mtcars
+counts = table(mtcars$cyl)  # Frequency table of variable 'cyl'
+barplot(counts, main = "barplot2", xlab = "No of Cylinders", ylab = "Frequency", col = "red")
+
+# If variable to be plotted is a factor or ordered factor, we can create a
+# vertical bar plot quickly with the plot() function without tabulating the values
+plot(as.factor(mtcars$cyl))
+# As here in dataframe 'mtcars', the variable 'cyl is considered as 'numeric'
+
+                   ***************************
+
+## B) Stacked and grouped bar plots
+
+install.packages("DMwR"); library(DMwR)
+data(algae)
+counts <- table(algae$season, algae$size)
+
+#stacked bar chart
+barplot(counts, main="stacked barplot", xlab = "speed", 
+        ylab="season", col = c("red","blue","yellow", "green"))
+barplot(counts, main="stacked barplot", xlab = "speed", 
+        ylab="season", col = c("red","blue","yellow", "green"), legend=rownames(counts))
+
+#grouped bar chart using besides = T
+barplot(counts, main="stacked barplot", xlab = "speed", 
+        ylab="season", col = c("red","blue","yellow", "green"), beside = T)
+barplot(counts, main="stacked barplot", xlab = "speed", 
+        ylab="season", col = c("red","blue","yellow", "green"), 
+        legend=rownames(counts), beside = T)
+
+## C) Mean bar plots
+# Bar plots needn’t be based on counts or frequencies. We can create bar plots that represent
+# means, medians, standard deviations, and so forth by using the aggregate function
+# and passing the results to the barplot() function.
+
+## D) Tweking bar plots
+## E) Spinograms
+
+
+
+
+# Pie chart --------------------------------------------------------------
+par(mfrow=c(2, 2)) # To combine multiple graphs into one window by spliting it in 2X2
+
+# data
+slices <- c(10, 12,4, 16, 8)
+lbls <- c("US", "UK", "Australia", "Germany", "France")
+
+par(mfcol=c(2,2))
+# simple pie chart
+pie(slices, labels = lbls, main="Simple Pie Chart")
+
+# percentage pie chart
+pct <- round(slices/sum(slices)*100); pct  # To compute percentages
+lbls2 <- paste(lbls, " ", pct, "%", sep=""), lbls2  # Naming of lebels
+pie(slices, labels=lbls2, main="Pie Chart with Percentages")
+
+pie(slices, labels=lbls, col=rainbow(length(lbls)),
+    main="Pie Chart with Percentages")  # Adding rainbow of length 5 to provide five colors for the graph.
+
+# 3d pie chart
+install.packages("plotrix"); 
+library(plotrix)
+
+pie3D(slices, labels=lbls,main="3D Pie Chart ")
+pie3D(slices, labels=lbls,main="3D Pie Chart ", radius = 0.5, height = 0.2)
+
+# fan chart [To make comparision easier]
+library(plotrix)
+
+fan.plot(slices, labels = lbls, main="Fan Plot")
+# In a fan plot, the slices are rearranged to overlap each other, and the radii are modified so
+# that each slice is visible. Here you can see that Germany is the largest slice
+# Note: the width of the slice and not the radius is what’s important here.
+
+
+
+# Histogram ---------------------------------------------------------------
+
+#Example_1
+mtcars # Load data
+head(mtcars)
+
+attach(mtcars); hist(mpg)
+
+hist(mtcars$mpg)
+
+hist(mtcars$mpg, col="blue")
+
+hist(mtcars$mpg, col="blue", breaks =10) # Including bins
+
+#Example_2
+u = rnorm(100); 
+hist(u); 
+plot(density(u))
+hist(u, density=5); hist(u, density=100) # Density _shades of density
+
+par(mfrow=c(1,2)); hist(u, density=20); hist(u, density=100)
+par(mfrow=c(1,1))
+
+# Probability Plot
+hist(u, density = 15, prob=T) # To plot probabilities on Y-Axis (instead of freq)
+hist(u, density=20, breaks=-3:3, ylim=c(0, 0.5), prob=TRUE) # Give range to plot
+curve(dnorm(x), col=2, add=TRUE) # To add std normal curve
+curve(dnorm(x,mean=2,sd=0.4), col=2, add=TRUE) # To add normal curve with mean2, & sd 0.4
+
+
+# Box & Whiskers Plot -----------------------------------------------------
+#Data
+mtcars
+
+#simple boxplot
+
+boxplot(mtcars$mpg, main="Box plot", ylab="Miles per Gallon")
+
+abline(h=mean(mtcars$mpg,na.rm=T),) # To add a line at mean value
+abline(h=mean(mtcars$mpg,na.rm=T), lty = 2) # lty changes line type
+
+# parallel boxplot
+#Example_1
+
+boxplot(mpg ~ cyl, data=mtcars,
+        main="Car Mileage Data",
+        xlab="Number of Cylinders",
+        ylab="Miles Per Gallon")
+
+
+boxplot(mpg ~ cyl, data=mtcars,
+        notch=TRUE,
+        varwidth=TRUE,
+        col="red",
+        main="Car Mileage Data",
+        xlab="Number of Cylinders",
+        ylab="Miles Per Gallon")
+
+# By adding notch=TRUE, we get notched box plots. If two boxe's notches don’t overlap, there’s
+# strong evidence that their medians differ
+
+#varwidth=TRUE produces box plots with widths that are proportional to their sample sizes.
+
+
+# Example_2
+data=iris
+boxplot(iris$Sepal.Length ~ iris$Species) # Side by side box plot
+boxplot(iris$Sepal.Length ~ iris$Species, main = "Sepal Length Vs Species", xlab = "Species", ylab = "Sepal Length") # Add lebels
+colors() # To view colors available
+boxplot(iris$Sepal.Length ~ iris$Species, main = "Sepal Length Vs Species", xlab = "Species", ylab = "Sepal Length", col = "Violet") # To add colors
+
+par(bg = "turquoise") # To change background color
+boxplot(iris$Sepal.Length ~ iris$Species, main = "Sepal Length Vs Species", xlab = "Species", ylab = "Sepal Length", col = "Violet") # To add colors
+
+
+# Boxplot using lattice package _ bwplot() function for Box & Whisker plot
+library(lattice)
+bwplot(iris$Sepal.Length ~ iris$Species, main = "Sepal Length Vs Species", xlab = "Species", ylab = "Sepal Length") # Add lebels
+
+# Also, other form of plot can be obtained by xyplot()
+xyplot(iris$Sepal.Length ~ iris$Species, main = "Sepal Length Vs Species", xlab = "Species", ylab = "Sepal Length", col = "red", pch = 3) # Add lebels
+
+# Boxplot using ggplot2 package _ qplot() function
+library(ggplot2)
+qplot(iris$Species, iris$Sepal.Length, geom = "boxplot")
+
+
+# Box plot for more than one grouping factor 
+
+mtcars$cyl.f <- factor(mtcars$cyl,
+                       levels=c(4,6,8),
+                       labels=c("4","6","8")) # To Creates a factor for the number of cylinders
+
+mtcars$am.f <- factor(mtcars$am,
+                      levels=c(0,1),
+                      labels=c("auto", "standard")) # To Creates a factor for transmission type
+
+
+boxplot(mpg ~ am.f *cyl.f,
+        data=mtcars,
+        varwidth=TRUE,
+        col=c("gold","darkgreen"),
+        main="MPG Distribution by Auto Type",
+        xlab="Auto Type", ylab="Miles Per Gallon") 
+
+#varwidth=TRUE produces boxplots with widths that are proportional to their sample sizes
+
+
+# Line Chart -------------------------------------------------------------
+
+x <- c(5, 15, 30, 5, 17)
+plot(x)
+
+plot(x, type = "l", col = "red", main = "Line Chart")
+
+plot(x, type = "p", col = "red", main = "Line Chart") # To draw points
+plot(x, type = "b", col = "red", main = "Line Chart") # To draw both points & lines
+plot(x, type = "o", col = "red", main = "Line Chart") # To draw both points & lines overplotted
+plot(x, type = "h", col = "red", main = "Line Chart") # To draw histogram like vertical lines
+plot(x, type = "s", col = "red", main = "Line Chart") # To draw staircase
+plot(x, type = "n", col = "red", main = "Line Chart") # To draw no chart
+
+plot(x, type = "l", col = "red", main = "Line Chart", lty = 3) # To change line type
+plot(x, type = "l", col = "red", main = "Line Chart", lty = 3, sub = "Test chart") # To add sub title
+
+# Multiple lines in line chart
+
+# Example_1
+x <- c(5, 15, 30, 5, 17); y <- c(7,12,28,3,41)
+
+plot(x, type = "l", col = "red", main = "Line Chart", sub = "Test chart") 
+lines(y, type = "l", col = "blue")
+
+# Example_2
+Plot multiple lines (data series) each with unique color in R
+
+x = c(24, 35, 47, 38, 22)
+y <- c(11, 36, 67, 34, 58)
+z <- c(20, 24, 35, 42, 17)
+plot(x, type="n")
+lines(x, type="b", pch=8, col="red")
+lines(y, type="l", lty=6, col="blue")
+lines(z, type="b", col="green")
+
+#Example_3
+A <- c(116.55, 113.5, 110.70, 106.25, 101.35)
+B <- c(116.75, 115.2, 114.05, 112.45, 111.95)
+data <- data.frame(A, B)
+row.names(data) <- c("DBP1", "DBP2", "DBP3", "DBP4", "DBP5")
+
+plot(A, type="n")
+axis(1, at=1:5, labels=c("DBP1","DBP2","DBP3","DBP4","DBP5"))
+lines(A, col="blue")
+lines(B, col="red")
+
+# Alternate way
+plot(A, type="l", col="blue")
+axis(1, at=1:5, labels=c("DBP1","DBP2","DBP3","DBP4","DBP5"))
+lines(B, col="red")
+
+# Example_4
+set.seed(42);x<-rnorm(100)
+
+plot(x,2*x+1,type="l",xlab="X",ylab="Y")
+lines(x,2*x+3)
+lines(x,(-2)*x+1)
+lines(x,(-2)*x+3)
+
+limy=c(-4,4)
+limx=c(-4,4)
+curve(y<-2*x+1,xlim=limx,ylim=limy,ylab="")
+par(new=T)
+curve(y<-2*x+3,xlim=limx,ylim=limy,ylab="")
+par(new=T)
+curve(y<-(-2)*x+1,xlim=limx,ylim=limy,ylab="")
+par(new=T)
+curve(y<-(-2)*x+3,xlim=limx,ylim=limy,ylab="")
+
+with ggplot2 library
+library(ggplot2)
+x <- rnorm(100*1,mean=0,sd=1)
+ggplot() + geom_line(aes(x,2*x+1)) + geom_line(aes(x,2*x+3)) etc
+# Alternate way
+plot(x, type="b", col="red")
+lines(y, type="l", lty=6, col="blue")
+lines(z, type="b", col="green")
+
+# Scatter Plot ------------------------------------------------------------
+
+http://www.sthda.com/english/wiki/correlation-matrix-a-quick-start-guide-to-analyze-format-and-visualize-a-correlation-matrix-using-r-software
+http://www.statmethods.net/graphs/scatterplot.html
+https://statistics.laerd.com/spss-tutorials/point-biserial-correlation-using-spss-statistics.php
+
+x<-c(2, 4, 3.8,5.4, 9.2, 8.5, 6.7, 5.5)
+y<-c(4.3, 2.5, 4.5, 8, 15, 15.2, 13.3, 10.5)
+
+plot(x, y) # creating scatter plot
+grid() # Adds grid to the plot
+grid(col="red", lty=1)
+
+plot(x, y, pch = 19) # pch changes plotting symbol [19 for solid circle]
+plot(x, y, pch = 15, col = "4") # col changes color [4 for blue]
+plot(x, y, pch=15, col="darkgreen", cex=1.5) # cex changes size of pch symbols
+plot(x, y, pch=12, col="green", cex=2, bg="red") # bg changes background/fill color of pch symbols
+# Note: 'bg' an be used only when pch = 21:25
+
+# Change color
+plot(x, y, pch=19, col="darkgreen", cex=1.5)
+# Color can be a vector
+plot(x, y, pch=19, col=c("green", "red"))
+# change border, background color and line width
+plot(x, y, pch = 24, cex=2, col="blue", bg="red", lwd=2)
+
+# Scatterplot Matrix
+pairs(iris)
+
+pairs(~Sepal.Length+Sepal.Width+Petal.Length, iris)
+
+# R script to generate a plot of point shapes in R ------------------------
+
+#generate a plot of point shapes which R knows about.
+#++++++++++++++++++++++++++++++++++++++++++++
+generateRPointShapes<-function(){
+  oldPar<-par()
+  par(font=2, mar=c(0.5,0,0,0))
+  y=rev(c(rep(1,6),rep(2,5), rep(3,5), rep(4,5), rep(5,5)))
+  x=c(rep(1:5,5),6)
+  plot(x, y, pch = 0:25, cex=1.5, ylim=c(1,5.5), xlim=c(1,6.5), 
+       axes=FALSE, xlab="", ylab="", bg="blue")
+  text(x, y, labels=0:25, pos=3)
+  par(mar=oldPar$mar,font=oldPar$font )
+}
+generateRPointShapes()
+
+
+# Density Plot ------------------------------------------------------------
+d = density(mtcars$mpg)
+plot(density(mtcars$mpg)); plot(d)
+
+
+
+
+# To Plot a function in a range
+
+curve(x^3);
+
+f1 <- function(x) 2*x^3   # To define a function f(x)=2*x^2 
+curve(f1,from=-2,to=3)    # To plot a function
+
+abline(v=0)        # add a vertical line at x=0
+abline(h=10)       # add a vertical line at y=10
+
+# Plot standard nmormal N(0,1) distribution
+
+curve(dnorm(x),from=-3,to=3)
+
+# Add t distribution with df=30 on it
+curve(dt(x,df=30),add=TRUE,lwd=2)
+legend("topleft",c("N(0,1)","t df=30"),lwd=c(1,2),bty="n")
