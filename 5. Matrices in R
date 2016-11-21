@@ -7,7 +7,10 @@
 ## Constructing a matrix in R
 ## Naming a matrix in R
 ## Subsetting of a matrix in R
-## Matrix arithmatics in R
+## Matrix algebra in R
+
+
+#  ------------------------------------------------------------------------
 
 
 ## MATRIX CREATION IN R
@@ -17,21 +20,91 @@ dim(aa) = c(1, 1) # To define the dimension of object i.e. one row and one colum
 aa # To print the object(matrix) 'aa'
 
 # To create a matrix by using matrix() function
-# See more here
-?matrix()
 
 # Construction of a matrix with 3 rows containing the numbers 1 upto 9
-x = matrix(1:9, nrow = 3, ncol = 3) 
+x = matrix(1:9, nrow = 3, ncol = 3); x 
 # By default byrow is FALSE, so matrix is created by column and dimnames are NULL, so no dimensions names are defined.
-x
 
-y = matrix(1:9, 3, 3) # Alternate way 
-y
+y = matrix(1:9, 3, 3); y # Alternate way 
 
-# To create a matrix by using by column
+# To create a matrix by using by row
 z = matrix(1:9, nrow = 3, ncol = 3, byrow = TRUE) # By default byrow is FALSE, so matrix is created by column
 z
 
+# To create identity matrix, which is a diagonal matrix
+m <- diag(nrow = 2, ncol = 2) # 2X2 identity matrix
+m <- diag(2) # Alternate way
+n <- 10; diag(nrow = n, ncol = n) # nXn identity matrix
+
+# To create diagonal matrices other than identity matrix
+m <- diag(c(2, 1), nrow = 2, ncol = 2) # 2X2 diagonal matrix with diag by specifying a vector of entries along the diagonal
+m <- diag(c(3,4,5)) # Diagonal matrix with elements of vector in the principal diagonal
+
+
+
+# ## Naming a matrix in R -------------------------------------------------
+
+rownames(a) = c("one", "two", "three")
+colnames(a) = c("Jan", "Feb", "Mar")
+a
+
+
+# ## Subsetting of a matrix in R ------------------------------------------
+
+x <- matrix(1:6, 2, 3)
+x[1, 2]  # Element of first row, second column [single element]
+x[2, 1]	# Element of second row, first column [single element]
+x[2, ] 		# Matrix of all the elements of  second row
+x[, 1] 		# Matrix of all the elements of  first column [matrix]
+x[1:2, 3]            # Elements of first & second row for third column only 
+
+
+x <- matrix(1:6, 2, 3)
+# By default, when a single element of a matrix is retrieved, it is returned as a vector of length 1 rather than a 1 × 1 matrix. 
+# This behaviour can be turned off by setting drop = FALSE.
+x[1, 2]  		# Single element
+x[1, 2, drop = FALSE]	# Matrix of one row & one column
+
+x <- matrix(1:6, 2, 3)  
+# Similarly, sub-setting a single column or a single row results in a vector, not a matrix (by default). 
+# This behaviour can be turned off by setting drop = FALSE.
+x[1, ]  		# Single row
+x[1,  , drop = FALSE]	# Matrix of one row & one column
+
+
+# # Matrix Algebra ----------------------------------------------------
+a <- matrix(1:9, byrow=TRUE, nrow=3)
+b = diag(nrow =3, ncol =3)
+
+t(a) # matrix transpose
+diag(a) # principle diagonal of matrix
+solve(b) # inverse of a matrix, if it is invertible
+a+b; a-b # matrix addition & subtraction
+a+3; b-4 # equivalent to a + 3I and b - 4I
+a*2; b*3 # scalar multiplication equivalent to a*2I and b*3I
+a*b; a/b # element wise multiplication & divison
+a%*%b # matrix multiplication
+
+m <- diag(c(2, 1), nrow = 2, ncol = 2)
+solve(m) %*% m == diag(nrow = nrow(m), ncol = ncol(m))
+m %*% solve(m) == diag(nrow = nrow(m), ncol = ncol(m))
+# As inverse of a matrix multiplied by matrix = identity matirx
+
+# The car package defines an inv function, which is simply a new name for solve
+# 
+# MASS package defines a ginv function, which gives the matrix pseudoinverse, 
+# a generalization of matrix inversion that works for all matrices
+
+library('MASS')
+
+m <- matrix(c(1, 1, 2, 2), nrow = 2, ncol = 2)
+solve(m)
+ginv(m)
+
+m <- diag(nrow = 2, ncol = 2)
+eigen(m) # Eigen values & Eigen vectors
+
+# Read More @ http://www.statmethods.net/advstats/matrix.html
 
 # More examples
 a <- matrix(1:9, byrow=TRUE, nrow=3)
@@ -42,13 +115,8 @@ b <- cbind(one,two,three)
 c <- rbind(one,two,three)
 d<- b%%a
 e<- a%%c
-# print
-a
-one
-b
-c
-d
-e
+
+
 
 # Box office Star Wars: In Millions (!)  First element: US, Second
 # element: Non-US
