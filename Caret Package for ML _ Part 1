@@ -1,0 +1,253 @@
+
+# Functions used ----------------------------------------------------------
+
+getModelInfo()
+dummyVars()
+createDataPartition()
+train()
+predict()
+confusionMatrix()
+traincontrol() a helper function that we pass to train() function to speed up
+
+
+# Load library
+library(caret)
+
+
+# getModelInfo() ----------------------------------------------------------
+
+# get names of all caret supported models 
+names(getModelInfo())
+
+# pick model glm and find out what type of model it is
+getModelInfo()$glm$type 
+# gbm performs both classification & regression
+
+# pick model slda and find out what type of model it is
+getModelInfo()$slda$type 
+# glm performs only classification 
+
+# dummyVars() -------------------------------------------------------------
+
+# It translate text data into numeric data for modeling purposes
+# Example_1
+sat_level <- data.frame(Satisfaction_Level=c('very satisfied', 'satisfied', 
+                                             'neutral', 'dissatisfied', 'very dissatisifed'))
+# To fit any model like regression, we need number associated with it
+# In this case, data is linear so we can easily add a rank column to associate numbers with it
+
+sat_level <- data.frame(Satisfaction_Level=c('very satisfied', 'satisfied', 
+                                             'neutral', 'dissatisfied', 'very dissatisifed'),
+                        ranks=c(1,2,3,4,5))
+# Difference between the levels is considered equal. It is a different issue
+
+# That can be done with ordered categorical data only, but
+# with data like gender, mariatl status, zip codes etc., it's not meaningful to give them ranks
+
+# Now with other data
+
+students <- data.frame(id=c(10,20,30,40,50), gender=c('male', 'female', 'female', 'male', 'male'),
+                       presence=c('P', 'A', 'P', 'A', 'P'), passed=c(0, 1, 1, 1, 0))
+
+# P - PRESENT, A - ABSENT in presence variable
+# P - PASS, F - FAIL in passed variable
+
+dmy <- dummyVars("~.", data=students) # To transform all factor variables of dataframe 'students'
+# It is not a dataframe yet, we need to create by using predict function
+
+predict(dmy, newdata=students); # It is of class 'matrix'
+class(predict(dmy, newdata=students)) # matrix
+
+# To coerce it to data frame
+studentsN <- as.data.frame(predict(dmy, newdata=students)); 
+class(studentsN) # data frame
+
+# Alternate way
+studentsN <- data.frame(predict(dmy, newdata=students)); class(studentsN)
+
+str(studentsN)
+
+# dummyVars() didn't transform the 'id' variable & 'passed' variable, which are numerical variables
+# It transforms only factor variables
+
+# To transform response variable also
+students$passed <- as.factor(students$passed)
+dmy <- dummyVars("~.", data=students) 
+studentsN <- as.data.frame(predict(dmy, newdata=students)); studentsN
+
+# To transform only selected variable(s)
+students <- data.frame(id=c(10,20,30,40,50), gender=c('male', 'female', 'female', 'male', 'male'),
+                       presence=c('P', 'A', 'P', 'A', 'P'), passed=c(0, 1, 1, 1, 0))
+dmy <- dummyVars("~gender", data=students) 
+studentsN <- as.data.frame(predict(dmy, newdata=students)); studentsN
+# Provides only dummified columns for 'gender' variables
+# Use cbind to get complete data frame
+
+dmy <- dummyVars("~gender+presence", data=students) 
+studentsN <- as.data.frame(predict(dmy, newdata=students)); studentsN
+
+dmy <- dummyVars("~.-gender", data=students, fullRank=T) 
+studentsN <- as.data.frame(predict(dmy, newdata=students)); studentsN
+
+dmy <- dummyVars("~.+gender*presence", data=students, fullRank=T) 
+studentsN <- as.data.frame(predict(dmy, newdata=students)); studentsN
+
+
+# Issue with dummyVars() _ Dummy variable trap
+# We get redundent columns like for female and male (we need only one), as female=0 means male
+# It will create colinearity issues
+# To deal with this issue, use argument fullRank= T
+
+dmy <- dummyVars("~.", data=students, fullRank=T) 
+studentsN <- as.data.frame(predict(dmy, newdata=students)); studentsN
+
+
+# createDataPartition()  -----------------------------------------------------------
+
+#Example_1 Video by Practical Machine Learning
+# https://www.youtube.com/watch?v=tAPsh9BZSGw
+
+library(kernlab)
+data(spam) # from kernlab library
+table(spam$type)
+
+# To split data into training & test set data
+# https://www.rdocumentation.org/packages/caret/versions/6.0-73/topics/createDataPartition
+
+intrain <- createDataPartition(y=spam$type, p=0.75, list=F)
+
+# p=0.75 ensures that 75% data goes into training set
+# list = F creats a matrix with the number of rows equal to floor(p * length(y)) and times columns.
+
+training <- spam[intrain,]
+test <- spam[-intrain,]
+dim(training); dim(test); dim(spam)
+
+
+# train() --------------------------------------------------------
+
+# continuing with the same example
+
+set.seed(32343)
+model <- train(type~.,data=training, method="glm")  # see ?train()
+model
+
+# we can use train(x,y) or train(y~x)
+# train() uses by default trControl=trainControl()
+# Which performs bootstrap for 25 iteration, which takes a while to compute
+# To make it faster, we can use cross validation with only 3 or 5 folds for example
+# By using helper function trainControl() and changin the default argumets
+
+
+# trainControl() function as helper function for train() ------------------
+
+# # create caret trainControl object to control 
+# # the number of cross-validations performed
+# 
+# objControl <- trainControl(method='cv', number=3, returnResamp='none', 
+#                            summaryFunction = twoClassSummary, 
+#                            classProbs = TRUE)
+# # number = 3 is the number of folds in cv
+# # else it is number of resampling iterations in bootstrap
+# # default value number = ifelse(grepl("cv", method), 10, 25)
+# # If method is cv, then number = 10, else it is 25
+# 
+# # returnResamp = 'none' indicats none of the resampled summary metrics 
+# # should be saved. Values can be "final", "all" or "none"
+# 
+# # classProbs = T ensures that class probabilities to be computed
+# # for classification models (along with predicted values) in each resample
+# 
+# 
+# # run model
+# objeModel <- train(type~.,data=training, method="glm")  
+# objModel
+
+# To get final model
+model$finalModel 
+
+
+# predict() ---------------------------------------------------------------
+
+
+# To predict for test data
+predictions <- predict(model, newdata=test)
+predictions
+
+
+# confusionMatrix() -------------------------------------------------------
+
+
+# Model Evaluation
+confusionMatrix(predictions, test$type)
+# predictions = Predictions on test data, test$type=actual values on test data
+
+
+# Video by Hui Lin --------------------------------------------------------
+# https://www.youtube.com/watch?v=99lnTku75Pc
+
+# Example_2
+library(caret)
+data(segmentationData) # from caret library
+dim(segmentationData); str(segmentationData)
+
+# To remove the Cell (identifier variable), which is not required for analysis
+segmentationData$Cell <- NULL
+
+# Authors has put 50:50 in training and test set
+# Create two dataframes which are subset of original data, taken as training and test by authors
+seg_train <- subset(segmentationData, Case=="Train"); dim(seg_train)
+seg_test <- subset(segmentationData, Case=="Test"); dim(seg_test)
+
+# Removing column Case from both data frames
+seg_train$Case <- NULL
+seg_test$Case <- NULL
+
+# Alternate way to create training & test data (50/50) as in Example_1
+
+intrain <- createDataPartition(y=segmentationData$Class, p=0.5, list=F) # Class is response variable
+
+training <- segmentationData[intrain,]
+test <- segmentationData[-intrain,]
+dim(training); dim(test); dim(segmentationData)
+
+
+# Linear Discriminant Analysis
+library(MASS) # for lda() function
+lda_fit <- lda(Class~., data=seg_train, tol = 1.0e-15)
+
+# Predicting on first 3 obs of training set just to view output
+predict(lda_fit, newdata= seg_train[1:3, ])
+# posterier gives class probabilities
+
+# To predict on test set
+lda_test_pred <- predict(lda_fit, newdata=seg_test)
+
+# To create ROC curve
+library(pROC)
+
+lda_roc <- roc(response = seg_test$Class,
+               # Observed/ Actual Classes
+               predictor = lda_test_pred$posterior[, "PS"],
+               # Measure of likelihood, here it is posterior (class) probability
+               levels = rev(levels(seg_test$Class)))
+                # We need to tell the function that the first level is our event of interest
+
+
+lda_roc
+
+# Note: 
+levels(seg_test$Class) # "PS" and "WS" levels of Class in test data
+rev(levels(seg_test$Class)) # Levels in reverse order
+
+
+
+# https://www.youtube.com/watch?v=99lnTku75Pc&list=PLnORDsS8KLUevXvldZ3PuGIuFZ9Fgoo1I&spfreload=5 
+
+# webinar by MAx Kuhn
+
+install.packages("C50"); library(C50)
+data(churn)
+str(churnTrain)
+
+predictors <- names(churnTrain)[names(churnTrain) != "churn"]
