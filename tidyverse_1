@@ -1,0 +1,70 @@
+# install.packages("tidyverse")
+library(tidyverse)
+tidyverse_packages()
+
+df = hflights::hflights
+
+
+# tibble ------------------------------------------------------------------
+
+# creating a tibble
+
+tribble(~name, ~domain, ~exp,
+        "Nisha", "Stats", 11,
+        "Gaurav", "IT", 14,
+        "Naomi", "Science", 5)
+
+
+tibble(name = c("Nisha", "Gaurav", "Naomi"),
+       domain = c("Stats", "IT", "Science"),
+       exp = c(11, 14, 5))
+
+
+# It's possible for a tibble to have column names that are not valid R variable names,
+# aka non-syntactic names
+tb <- tibble(
+  `:)` = "smile", 
+  ` ` = "space",
+  `2000` = "number"
+)
+tb
+
+as_tibble(mtcars)
+
+# to convert a tibble to a data frame
+as.data.frame(table1)
+
+as_data_frame(mtcars)
+
+
+storms
+
+View(storms) #view(storms) is working too
+
+# view(mtcars); View(mtcars)
+
+# To print
+hflights::hflights %>% 
+  print(n = 10, width = Inf)
+
+nycflights13::flights %>% 
+  print(n = 10, width = Inf)
+
+
+# To pivot/to convert long data to wide -----------------------------------
+
+table2
+
+table2 %>% spread(key = 'type', value = 'count')
+# It move variable names out of the cells and into the column names. 
+
+
+
+# To  convert wide data to long -------------------------------------------
+
+table4a
+
+table4a %>% gather(key = "Year", value = "Cases", 2:3)
+
+# It gathers a field of cells into a pair of columns
+# It move variable values out of the column names and into the cells
